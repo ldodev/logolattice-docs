@@ -4,19 +4,23 @@
   "name": "Logo Lattice",
   "description": "Documentation for Logo Lattice - the browser-based grid logo editor",
   "colors": {
-    "primary": "#16A34A",
-    "light": "#07C983",
-    "dark": "#15803D"
+    "primary": "#488ccd",
+    "light": "#6fbaff",
+    "dark": "#488ccd"
   },
   "favicon": "/favicon.svg",
   "redirects": [
     {
       "source": "/",
-      "destination": "/api-reference/studio-logo-api/introduction"
+      "destination": "/api-reference/describe-api/introduction"
     },
     {
       "source": "/index",
-      "destination": "/api-reference/studio-logo-api/introduction"
+      "destination": "/api-reference/describe-api/introduction"
+    },
+    {
+      "source": "/api-reference/studio-logo-api/:slug*",
+      "destination": "/api-reference/describe-api/:slug*"
     }
   ],
   "navigation": {
@@ -25,19 +29,19 @@
         "tab": "API reference",
         "groups": [
           {
-            "group": "Studio Logo API",
-            "openapi": "api-reference/studio-logo-api/openapi.json",
+            "group": "Describe API",
+            "openapi": "api-reference/describe-api/openapi.json",
             "pages": [
-              "api-reference/studio-logo-api/introduction",
-              "api-reference/studio-logo-api/authentication",
-              "api-reference/studio-logo-api/quickstart",
-              "api-reference/studio-logo-api/generate-logo",
-              "api-reference/studio-logo-api/get-usage",
-              "api-reference/studio-logo-api/errors",
-              "api-reference/studio-logo-api/quotas",
-              "api-reference/studio-logo-api/reference-images",
-              "api-reference/studio-logo-api/best-practices",
-              "api-reference/studio-logo-api/changelog"
+              "api-reference/describe-api/introduction",
+              "api-reference/describe-api/authentication",
+              "api-reference/describe-api/quickstart",
+              "api-reference/describe-api/generate-logo",
+              "api-reference/describe-api/get-usage",
+              "api-reference/describe-api/errors",
+              "api-reference/describe-api/quotas",
+              "api-reference/describe-api/reference-images",
+              "api-reference/describe-api/best-practices",
+              "api-reference/describe-api/changelog"
             ]
           }
         ]

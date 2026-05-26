@@ -23,7 +23,7 @@ Generate a logo from a text brief. Returns SVG, a cloud `projectId`, and an `edi
 </ParamField>
 
 <ParamField body="referenceImageBase64" type="string">
-  Base64-encoded reference image for palette or composition inspiration. Max **4 MB** decoded. Not saved to your account. See [Reference images](/api-reference/studio-logo-api/reference-images).
+  Base64-encoded reference image for palette or composition inspiration. Max **4 MB** decoded. Not saved to your account. See [Reference images](/api-reference/describe-api/reference-images).
 </ParamField>
 
 <ParamField body="referenceMimeType" type="string">
@@ -148,4 +148,4 @@ curl -X POST "https://logolattice.com/api/v1/logos" \
 | `502`  | Upstream model failure                                                                   |
 | `503`  | AI not configured on server                                                              |
 
-See [Errors](/api-reference/studio-logo-api/errors) for `code` values and examples.
+See [Errors](/api-reference/describe-api/errors) for `code` values and examples.

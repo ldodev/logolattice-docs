@@ -10,11 +10,11 @@ import { fileURLToPath } from "node:url";
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const specPath = join(
   root,
-  "api-reference/studio-logo-api/openapi.json"
+  "api-reference/describe-api/openapi.json"
 );
 const devPath = join(
   root,
-  "api-reference/studio-logo-api/openapi.dev.json"
+  "api-reference/describe-api/openapi.dev.json"
 );
 
 const spec = JSON.parse(readFileSync(specPath, "utf8"));

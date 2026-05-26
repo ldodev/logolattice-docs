@@ -1,7 +1,7 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "Logo Lattice Studio Logo API",
+    "title": "Logo Lattice Describe API",
     "description": "Generate vector logos programmatically from text prompts. Studio subscribers only.",
     "version": "1.0.0"
   },
@@ -23,7 +23,7 @@
         "summary": "Generate a logo",
         "description": "Generate a logo from a text brief and return SVG plus a deep link to continue editing.",
         "x-mint": {
-          "href": "/api-reference/studio-logo-api/generate-logo"
+          "href": "/api-reference/describe-api/generate-logo"
         },
         "requestBody": {
           "required": true,
@@ -115,7 +115,7 @@
         "summary": "Get AI credit usage",
         "description": "Check remaining AI credits without generating a logo.",
         "x-mint": {
-          "href": "/api-reference/studio-logo-api/get-usage"
+          "href": "/api-reference/describe-api/get-usage"
         },
         "responses": {
           "200": {
