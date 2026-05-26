@@ -8,14 +8,8 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
-const specPath = join(
-  root,
-  "api-reference/describe-api/openapi.json"
-);
-const devPath = join(
-  root,
-  "api-reference/describe-api/openapi.dev.json"
-);
+const specPath = join(root, "api-reference/describe-api/openapi.json");
+const devPath = join(root, "scripts/openapi.dev.json");
 
 const spec = JSON.parse(readFileSync(specPath, "utf8"));
 spec.servers = [

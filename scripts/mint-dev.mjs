@@ -11,7 +11,7 @@ import { fileURLToPath } from "node:url";
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const docsPath = join(root, "docs.json");
 const backupPath = join(root, "docs.json.__mint_dev_backup__");
-const devOpenapi = "api-reference/describe-api/openapi.dev.json";
+const devOpenapi = "scripts/openapi.dev.json";
 
 await import("./sync-openapi-dev.mjs");
 
