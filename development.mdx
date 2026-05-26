@@ -22,16 +22,28 @@ npm i -g mint
 
 <Step title="Preview locally">
 
-Navigate to your docs directory where your `docs.json` file is located, and run the following command:
+Navigate to your docs directory where your `docs.json` file is located, and run:
 
 ```bash
-mint dev
+npm run dev
 ```
 
-A local preview of your documentation will be available at `http://localhost:3000`.
+This starts Mintlify with the **dev OpenAPI spec**, which adds `http://localhost:3000` as a server in the API playground (for a local Logo Lattice app). Plain `mint dev` uses production-only servers.
 
 </Step>
 </Steps>
+
+## Local API playground
+
+When you run `npm run dev`, the API playground includes a **Local development** server (`http://localhost:3000`) in addition to production. Select it from the server dropdown on endpoint pages to send requests to your local Logo Lattice instance.
+
+<Warning>
+  Logo Lattice and Mintlify both default to port **3000**. Run your app on `3000` and start docs on another port, for example `npm run dev -- --port 3333`, so the preview and API do not conflict.
+</Warning>
+
+The dev script also sets `api.playground.proxy` to `false` so the browser talks to `localhost` directly (required for local CORS).
+
+After changing `openapi.json`, run `npm run sync-openapi-dev` to refresh `openapi.dev.json`.
 
 ## Custom ports
 

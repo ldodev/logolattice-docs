@@ -1,0 +1,70 @@
+---
+title: Quickstart
+description: Generate a logo with curl and save the SVG response
+icon: bolt
+---
+
+Generate a logo in three steps: set your API key, call the API, and use the response.
+
+## Prerequisites
+
+- A [Logo Lattice Studio](https://logolattice.com) subscription
+- An API key from [Studio → API keys](https://logolattice.com/studio/api-keys)
+
+<Warning>
+  Never commit API keys to source control. Use environment variables.
+</Warning>
+
+## 1. Set your API key
+
+```bash
+export LOGO_LATTICE_API_KEY="ll_live_YOUR_SECRET_HERE"
+```
+
+## 2. Generate a logo
+
+```bash
+curl -X POST "https://logolattice.com/api/v1/logos" \
+  -H "Authorization: Bearer $LOGO_LATTICE_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"prompt":"Isometric teal mountain mark, minimal facets, square grid"}' \
+  -o response.json
+```
+
+## 3. Use the response
+
+The JSON body includes:
+
+| Field | Use |
+| --- | --- |
+| `svg` | Write to a `.svg` file or pass to your design pipeline |
+| `editUrl` | Open in the browser while signed in to refine the mark |
+| `projectId` | Reference the saved cloud project |
+| `usage` | See remaining AI credits after this generation |
+
+Save the SVG:
+
+```bash
+# Requires jq
+jq -r '.svg' response.json > logo.svg
+```
+
+Open the project in the editor (while signed in as the key owner):
+
+```bash
+jq -r '.editUrl' response.json
+# Example: https://logolattice.com/?project=clx123abc
+```
+
+## Check credits without generating
+
+```bash
+curl "https://logolattice.com/api/v1/logos/usage" \
+  -H "Authorization: Bearer $LOGO_LATTICE_API_KEY"
+```
+
+## Next steps
+
+- [Generate logo](/api-reference/studio-logo-api/generate-logo) — full request and response reference
+- [Best practices](/api-reference/studio-logo-api/best-practices) — write effective prompts
+- [Reference images](/api-reference/studio-logo-api/reference-images) — optional palette and composition hints

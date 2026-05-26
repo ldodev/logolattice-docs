@@ -1,0 +1,55 @@
+---
+title: Authentication
+description: Bearer API keys for Studio Logo API requests
+icon: key
+---
+
+All v1 logo endpoints require an API key in the `Authorization` header:
+
+```http
+Authorization: Bearer <api_key>
+```
+
+## Key format
+
+Keys use the prefix `ll_live_` followed by a secret. The full value is shown **once** when you create the key in Studio.
+
+<Warning>
+  Never commit API keys to source control. Store keys in environment variables or a secrets manager (for example `LOGO_LATTICE_API_KEY`).
+</Warning>
+
+## Create an API key
+
+<Steps>
+  <Step title="Sign in to Studio">
+    Open [Logo Lattice](https://logolattice.com) and sign in with a Studio account.
+  </Step>
+  <Step title="Open API keys">
+    Go to **Studio → API keys** at [`/studio/api-keys`](https://logolattice.com/studio/api-keys).
+  </Step>
+  <Step title="Create and copy">
+    Create a named key and copy the full secret immediately. Logo Lattice stores only a SHA-256 hash; the secret cannot be retrieved later.
+  </Step>
+  <Step title="Store securely">
+    Save the key in your deployment secrets or local env file (never in git).
+  </Step>
+</Steps>
+
+## Limits and behaviour
+
+| Rule | Detail |
+| --- | --- |
+| Active keys | Up to **5** per Studio account |
+| Revoked keys | Return **401** immediately |
+| Non-Studio accounts | Cannot create keys or call the API (**403**) |
+
+## Example header
+
+```bash
+export LOGO_LATTICE_API_KEY="ll_live_YOUR_SECRET_HERE"
+
+curl "https://logolattice.com/api/v1/logos/usage" \
+  -H "Authorization: Bearer $LOGO_LATTICE_API_KEY"
+```
+
+Revoke keys anytime from **Studio → API keys**. Update integrations before revoking keys that are still in use.

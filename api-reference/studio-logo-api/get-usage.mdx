@@ -1,0 +1,78 @@
+---
+title: Get usage
+description: GET /api/v1/logos/usage — check remaining AI credits
+openapi: 'GET /api/v1/logos/usage'
+---
+
+Check remaining AI credits without generating a logo.
+
+## Request
+
+<ParamField header="Authorization" type="string" required>
+  `Bearer <api_key>` — Studio API key (`ll_live_…`).
+</ParamField>
+
+<RequestExample>
+
+```bash curl
+curl "https://logolattice.com/api/v1/logos/usage" \
+  -H "Authorization: Bearer $LOGO_LATTICE_API_KEY"
+```
+
+</RequestExample>
+
+## Response
+
+<ResponseField name="monthlyUsed" type="integer">
+  Credits used this calendar month (UTC).
+</ResponseField>
+
+<ResponseField name="monthlyLimit" type="integer">
+  Monthly allowance. Studio includes **10** generations per calendar month (UTC), shared with in-editor Describe and AI stylise.
+</ResponseField>
+
+<ResponseField name="monthlyRemaining" type="integer">
+  Credits left in the monthly pool before bonus credits.
+</ResponseField>
+
+<ResponseField name="bonusCredits" type="integer">
+  Extra credits from [$5.99 top-ups](https://logolattice.com) (30 credits per purchase). Added to `remaining`.
+</ResponseField>
+
+<ResponseField name="remaining" type="integer">
+  Total credits available for generation.
+</ResponseField>
+
+<ResponseField name="limit" type="integer">
+  Deprecated — prefer `monthlyLimit` for display.
+</ResponseField>
+
+<ResponseField name="resetsAt" type="string">
+  ISO 8601 timestamp when the monthly pool resets (UTC month boundary).
+</ResponseField>
+
+<ResponseExample>
+
+```json Success
+{
+  "monthlyUsed": 3,
+  "monthlyLimit": 10,
+  "monthlyRemaining": 7,
+  "bonusCredits": 0,
+  "remaining": 7,
+  "limit": 10,
+  "resetsAt": "2026-06-01T00:00:00.000Z"
+}
+```
+
+</ResponseExample>
+
+## HTTP status codes
+
+| Status | When |
+| --- | --- |
+| `200` | Success |
+| `401` | Missing, invalid, or revoked Bearer token |
+| `403` | Account is not Studio |
+
+Auth errors use the same shape as [Generate logo](/api-reference/studio-logo-api/generate-logo). See [Errors](/api-reference/studio-logo-api/errors).

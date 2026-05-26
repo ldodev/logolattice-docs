@@ -1,0 +1,253 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Logo Lattice Studio Logo API",
+    "description": "Generate vector logos programmatically from text prompts. Studio subscribers only.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://logolattice.com",
+      "description": "Production"
+    }
+  ],
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "paths": {
+    "/api/v1/logos": {
+      "post": {
+        "operationId": "generateLogo",
+        "summary": "Generate a logo",
+        "description": "Generate a logo from a text brief and return SVG plus a deep link to continue editing.",
+        "x-mint": {
+          "href": "/api-reference/studio-logo-api/generate-logo"
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GenerateLogoRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Logo generated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenerateLogoResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input or project limit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid API key",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Studio subscription required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "No AI credits remaining",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Upstream model failure",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "AI not configured",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/logos/usage": {
+      "get": {
+        "operationId": "getLogoUsage",
+        "summary": "Get AI credit usage",
+        "description": "Check remaining AI credits without generating a logo.",
+        "x-mint": {
+          "href": "/api-reference/studio-logo-api/get-usage"
+        },
+        "responses": {
+          "200": {
+            "description": "Usage retrieved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Usage"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid API key",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Studio subscription required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "API key with prefix `ll_live_`"
+      }
+    },
+    "schemas": {
+      "GenerateLogoRequest": {
+        "type": "object",
+        "required": [
+          "prompt"
+        ],
+        "properties": {
+          "prompt": {
+            "type": "string",
+            "minLength": 10,
+            "maxLength": 800,
+            "description": "Logo brief describing style, subject, colours, and grid feel."
+          },
+          "referenceImageBase64": {
+            "type": "string",
+            "description": "Base64-encoded reference image (max 4 MB decoded)."
+          },
+          "referenceMimeType": {
+            "type": "string",
+            "enum": [
+              "image/png",
+              "image/jpeg",
+              "image/webp"
+            ],
+            "description": "Required when referenceImageBase64 is set."
+          }
+        }
+      },
+      "Usage": {
+        "type": "object",
+        "properties": {
+          "monthlyUsed": {
+            "type": "integer"
+          },
+          "monthlyLimit": {
+            "type": "integer"
+          },
+          "monthlyRemaining": {
+            "type": "integer"
+          },
+          "bonusCredits": {
+            "type": "integer"
+          },
+          "remaining": {
+            "type": "integer"
+          },
+          "limit": {
+            "type": "integer",
+            "deprecated": true
+          },
+          "resetsAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "GenerateLogoResponse": {
+        "type": "object",
+        "properties": {
+          "svg": {
+            "type": "string"
+          },
+          "editUrl": {
+            "type": "string",
+            "format": "uri"
+          },
+          "projectId": {
+            "type": "string"
+          },
+          "usage": {
+            "$ref": "#/components/schemas/Usage"
+          }
+        }
+      },
+      "ApiError": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          },
+          "usage": {
+            "$ref": "#/components/schemas/Usage"
+          }
+        }
+      }
+    }
+  }
+}

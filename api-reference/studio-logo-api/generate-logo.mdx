@@ -1,0 +1,150 @@
+---
+title: Generate logo
+description: POST /api/v1/logos — create a vector logo from a text prompt
+openapi: 'POST /api/v1/logos'
+---
+
+Generate a logo from a text brief. Returns SVG, a cloud `projectId`, and an `editUrl` to continue in the editor.
+
+## Request
+
+<ParamField header="Authorization" type="string" required>
+  `Bearer <api_key>` — Studio API key (`ll_live_…`).
+</ParamField>
+
+<ParamField header="Content-Type" type="string" required>
+  `application/json`
+</ParamField>
+
+### Body
+
+<ParamField body="prompt" type="string" required>
+  Logo brief after trimming. **10–800 characters.** Describe style, subject, colours, and grid feel (for example isometric, minimal facets).
+</ParamField>
+
+<ParamField body="referenceImageBase64" type="string">
+  Base64-encoded reference image for palette or composition inspiration. Max **4 MB** decoded. Not saved to your account. See [Reference images](/api-reference/studio-logo-api/reference-images).
+</ParamField>
+
+<ParamField body="referenceMimeType" type="string">
+  Required when `referenceImageBase64` is set. One of: `image/png`, `image/jpeg`, `image/webp`.
+</ParamField>
+
+<RequestExample>
+
+```bash curl
+curl -X POST "https://logolattice.com/api/v1/logos" \
+  -H "Authorization: Bearer $LOGO_LATTICE_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"prompt":"Isometric teal mountain mark, minimal facets, square grid"}'
+```
+
+```bash curl Reference image
+curl -X POST "https://logolattice.com/api/v1/logos" \
+  -H "Authorization: Bearer $LOGO_LATTICE_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "prompt": "Match the teal palette and triangular silhouette, simplify to an isometric lattice mark",
+    "referenceImageBase64": "'$(base64 -i reference.png | tr -d '\n')'",
+    "referenceMimeType": "image/png"
+  }'
+```
+
+</RequestExample>
+
+## Response
+
+<ResponseField name="svg" type="string" required>
+  Full SVG document with clean paths. Transparent artboard; suitable for web, print, and design tools. Server-side export. Web fonts in text logos may differ slightly from the browser editor when custom fonts were used.
+</ResponseField>
+
+<ResponseField name="editUrl" type="string" required>
+  URL to open the project in Logo Lattice. Requires the API key owner to be signed in. Not a public anonymous editor link.
+</ResponseField>
+
+<ResponseField name="projectId" type="string" required>
+  Cloud project ID (also appears as the `project` query parameter in `editUrl`).
+</ResponseField>
+
+<ResponseField name="usage" type="object" required>
+  Remaining AI credits after this generation. Monthly limit resets at the UTC month boundary (`resetsAt`).
+</ResponseField>
+
+<ResponseField name="usage.monthlyUsed" type="integer">
+  Credits used this calendar month (UTC).
+</ResponseField>
+
+<ResponseField name="usage.monthlyLimit" type="integer">
+  Monthly allowance (Studio includes **10** per month, shared with Describe and AI stylise).
+</ResponseField>
+
+<ResponseField name="usage.monthlyRemaining" type="integer">
+  Credits left in the monthly pool before bonus credits.
+</ResponseField>
+
+<ResponseField name="usage.bonusCredits" type="integer">
+  Extra credits from top-ups.
+</ResponseField>
+
+<ResponseField name="usage.remaining" type="integer">
+  Total credits available (`monthlyRemaining` + bonus).
+</ResponseField>
+
+<ResponseField name="usage.limit" type="integer">
+  Deprecated — prefer `monthlyLimit` for display.
+</ResponseField>
+
+<ResponseField name="usage.resetsAt" type="string">
+  ISO 8601 timestamp when the monthly pool resets (UTC month boundary).
+</ResponseField>
+
+<ResponseExample>
+
+```json Success
+{
+  "svg": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>...",
+  "editUrl": "https://logolattice.com/?project=clx123abc",
+  "projectId": "clx123abc",
+  "usage": {
+    "monthlyUsed": 3,
+    "monthlyLimit": 10,
+    "monthlyRemaining": 7,
+    "bonusCredits": 0,
+    "remaining": 7,
+    "limit": 10,
+    "resetsAt": "2026-06-01T00:00:00.000Z"
+  }
+}
+```
+
+```json Error
+{
+  "error": "No AI generations remaining this month.",
+  "code": "limit_exceeded",
+  "usage": {
+    "monthlyUsed": 10,
+    "monthlyLimit": 10,
+    "monthlyRemaining": 0,
+    "bonusCredits": 0,
+    "remaining": 0,
+    "limit": 10,
+    "resetsAt": "2026-06-01T00:00:00.000Z"
+  }
+}
+```
+
+</ResponseExample>
+
+## HTTP status codes
+
+| Status | When |
+| --- | --- |
+| `200` | Success |
+| `400` | Invalid JSON, validation failed, parse error, empty model result, or cloud project limit |
+| `401` | Missing, invalid, or revoked Bearer token |
+| `403` | Account is not Studio |
+| `429` | No AI credits remaining |
+| `502` | Upstream model failure |
+| `503` | AI not configured on server |
+
+See [Errors](/api-reference/studio-logo-api/errors) for `code` values and examples.

@@ -1,0 +1,45 @@
+---
+title: Quotas and billing
+description: AI credits, monthly resets, and top-ups for the Studio Logo API
+icon: gauge
+---
+
+## Monthly credits
+
+Studio includes **10 AI generations per calendar month (UTC)**. That pool is **shared** across:
+
+- This API (`POST /api/v1/logos`)
+- In-editor **Describe**
+- In-editor **AI stylise**
+
+Check your balance anytime with [`GET /api/v1/logos/usage`](/api-reference/studio-logo-api/get-usage).
+
+## When credits are consumed
+
+| Event | Credits |
+| --- | --- |
+| Successful `POST /api/v1/logos` | **1 credit** |
+| Failed generation (upstream or API error after a failed attempt) | Generally **no credit** (same as in-editor Describe) |
+| `GET /api/v1/logos/usage` | **0 credits** |
+
+## When you are out of credits
+
+When `remaining` is `0`, `POST /api/v1/logos` returns **429** with `code: "limit_exceeded"` until either:
+
+- The monthly pool resets at `resetsAt` (UTC month boundary), or
+- You purchase a credit top-up in Studio.
+
+## Bonus credits
+
+Top-ups (**$5.99** for **30 credits**) add to `bonusCredits` and increase `remaining`. They do not change `monthlyLimit`.
+
+Prefer `monthlyLimit` and `monthlyRemaining` for UI that shows the monthly allowance; use `remaining` for “can I generate now?” checks.
+
+## Manage keys and usage
+
+- Create and revoke keys: [Studio → API keys](https://logolattice.com/studio/api-keys)
+- View usage on the same page and via the usage endpoint
+
+<Info>
+  The `limit` field in usage responses is **deprecated**. Use `monthlyLimit` for display.
+</Info>

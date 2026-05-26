@@ -1,0 +1,67 @@
+---
+title: Errors
+description: HTTP status codes and error codes for the Studio Logo API
+icon: triangle-exclamation
+---
+
+Failed requests return JSON with a human-readable message and a machine-readable `code`.
+
+## Error response shape
+
+```json
+{
+  "error": "Human-readable message",
+  "code": "error_code",
+  "usage": { }
+}
+```
+
+The `usage` object is included when relevant (for example quota errors), using the same fields as a successful generation response.
+
+## HTTP status codes
+
+| Status | When |
+| --- | --- |
+| `200` | Success |
+| `400` | Invalid JSON, validation failed, parse error, empty model result, cloud project limit (rare for Studio) |
+| `401` | Missing or invalid Bearer token, or revoked key |
+| `403` | Account is not Studio |
+| `429` | No AI credits remaining |
+| `502` | Upstream model failure |
+| `503` | AI not configured on server |
+
+## Error codes
+
+| Code | HTTP | Meaning |
+| --- | --- | --- |
+| `invalid_key` | `401` | Bad or missing API key |
+| `revoked` | `401` | Key was revoked |
+| `not_premium` | `403` | Studio subscription required |
+| `invalid_input` | `400` | Prompt or reference image validation failed |
+| `parse_error` | `400` | Model returned unusable logo data |
+| `project_limit_exceeded` | `400` | Cannot create cloud project (free-tier project cap) |
+| `limit_exceeded` | `429` | No AI generations left |
+| `upstream` | `502` | OpenAI or other upstream error |
+| `not_configured` | `503` | AI unavailable on server |
+
+## Example: quota exceeded
+
+```json
+{
+  "error": "No AI generations remaining this month.",
+  "code": "limit_exceeded",
+  "usage": {
+    "monthlyUsed": 10,
+    "monthlyLimit": 10,
+    "monthlyRemaining": 0,
+    "bonusCredits": 0,
+    "remaining": 0,
+    "limit": 10,
+    "resetsAt": "2026-06-01T00:00:00.000Z"
+  }
+}
+```
+
+<Tip>
+  Poll `GET /api/v1/logos/usage` before batch jobs to avoid `429` responses mid-run.
+</Tip>

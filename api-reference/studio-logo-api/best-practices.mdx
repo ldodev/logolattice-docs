@@ -1,0 +1,54 @@
+---
+title: Best practices
+description: Write effective logo prompts for the Studio Logo API
+icon: lightbulb
+---
+
+Strong prompts produce marks that fit Logo Lattice’s grid-based vector style. Treat the `prompt` field like a creative brief, not marketing copy.
+
+## Focus on one mark
+
+Describe **one symbol or mark**, not a full scene, UI mockup, or long brand paragraph.
+
+<Tip>
+  **Good:** Isometric teal mountain, minimal facets, square grid, single icon
+</Tip>
+
+<Warning>
+  **Avoid:** A complete landing page hero with text, buttons, and background scenery
+</Warning>
+
+## Specify grid and detail
+
+Mention:
+
+- **Grid type** — square vs isometric
+- **Palette** — named colours or mood (teal, monochrome, warm earth tones)
+- **Detail level** — minimal facets, bold blocks, fine lattice lines
+
+Example:
+
+```
+Isometric amber fox head, 6–8 facets, warm palette, clean silhouette for app icon
+```
+
+## Use reference images deliberately
+
+When you send `referenceImageBase64`, state in the prompt:
+
+- What to **borrow** (palette, silhouette, proportions)
+- What to **simplify** (drop texture, reduce to lattice geometry)
+
+Example:
+
+```
+Match the navy and gold palette from the reference; simplify to a square-grid lettermark, no gradients
+```
+
+## Length
+
+After trimming, keep prompts between **10 and 800 characters**. Shorter, specific briefs usually outperform long unstructured text.
+
+## Test in the editor first
+
+The API uses the same model as **Describe** in the editor. If a brief works well there, it will likely work via the API.

@@ -1,72 +1,43 @@
 {
   "$schema": "https://mintlify.com/docs.json",
   "theme": "mint",
-  "name": "Mintlify Starter Kit",
+  "name": "Logo Lattice",
+  "description": "Documentation for Logo Lattice — the browser-based grid logo editor",
   "colors": {
     "primary": "#16A34A",
     "light": "#07C983",
     "dark": "#15803D"
   },
   "favicon": "/favicon.svg",
+  "redirects": [
+    {
+      "source": "/",
+      "destination": "/api-reference/studio-logo-api/introduction"
+    },
+    {
+      "source": "/index",
+      "destination": "/api-reference/studio-logo-api/introduction"
+    }
+  ],
   "navigation": {
     "tabs": [
-      {
-        "tab": "Guides",
-        "groups": [
-          {
-            "group": "Getting started",
-            "pages": [
-              "index",
-              "quickstart",
-              "development"
-            ]
-          },
-          {
-            "group": "Customization",
-            "pages": [
-              "essentials/settings",
-              "essentials/navigation"
-            ]
-          },
-          {
-            "group": "Writing content",
-            "pages": [
-              "essentials/markdown",
-              "essentials/code",
-              "essentials/images",
-              "essentials/components",
-              "essentials/reusable-snippets"
-            ]
-          },
-          {
-            "group": "Agent ready",
-            "pages": [
-              "agent-ready/prompt",
-              "agent-ready/visibility",
-              "agent-ready/contextual",
-              "ai-tools/cursor",
-              "ai-tools/claude-code",
-              "ai-tools/windsurf"
-            ]
-          }
-        ]
-      },
       {
         "tab": "API reference",
         "groups": [
           {
-            "group": "API documentation",
+            "group": "Studio Logo API",
+            "openapi": "api-reference/studio-logo-api/openapi.dev.json",
             "pages": [
-              "api-reference/introduction"
-            ]
-          },
-          {
-            "group": "Endpoint examples",
-            "pages": [
-              "api-reference/endpoint/get",
-              "api-reference/endpoint/create",
-              "api-reference/endpoint/delete",
-              "api-reference/endpoint/webhook"
+              "api-reference/studio-logo-api/introduction",
+              "api-reference/studio-logo-api/authentication",
+              "api-reference/studio-logo-api/quickstart",
+              "api-reference/studio-logo-api/generate-logo",
+              "api-reference/studio-logo-api/get-usage",
+              "api-reference/studio-logo-api/errors",
+              "api-reference/studio-logo-api/quotas",
+              "api-reference/studio-logo-api/reference-images",
+              "api-reference/studio-logo-api/best-practices",
+              "api-reference/studio-logo-api/changelog"
             ]
           }
         ]
@@ -75,14 +46,14 @@
     "global": {
       "anchors": [
         {
-          "anchor": "Documentation",
-          "href": "https://mintlify.com/docs",
-          "icon": "book-open-cover"
+          "anchor": "Logo Lattice",
+          "href": "https://logolattice.com",
+          "icon": "grid"
         },
         {
-          "anchor": "Blog",
-          "href": "https://mintlify.com/blog",
-          "icon": "newspaper"
+          "anchor": "Studio",
+          "href": "https://logolattice.com/studio/api-keys",
+          "icon": "key"
         }
       ]
     }
@@ -95,32 +66,36 @@
     "links": [
       {
         "label": "Support",
-        "href": "mailto:hi@mintlify.com"
+        "href": "mailto:support@logolattice.com"
       }
     ],
     "primary": {
       "type": "button",
-      "label": "Dashboard",
-      "href": "https://dashboard.mintlify.com"
+      "label": "Open Logo Lattice",
+      "href": "https://logolattice.com"
+    }
+  },
+  "api": {
+    "playground": {
+      "display": "interactive",
+      "proxy": false
     }
   },
   "contextual": {
     "options": [
-     "copy",
-     "view",
-     "chatgpt",
-     "claude",
-     "perplexity",
-     "mcp",
-     "cursor",
-     "vscode"
-   ]
+      "copy",
+      "view",
+      "chatgpt",
+      "claude",
+      "perplexity",
+      "mcp",
+      "cursor",
+      "vscode"
+    ]
   },
   "footer": {
     "socials": {
-      "x": "https://x.com/mintlify",
-      "github": "https://github.com/mintlify",
-      "linkedin": "https://linkedin.com/company/mintlify"
+      "github": "https://github.com/logolattice"
     }
   }
 }
