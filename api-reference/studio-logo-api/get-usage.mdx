@@ -1,7 +1,7 @@
 ---
 title: Get usage
-description: GET /api/v1/logos/usage — check remaining AI credits
-openapi: 'GET /api/v1/logos/usage'
+description: GET /api/v1/logos/usage - check remaining AI credits
+openapi: "GET /api/v1/logos/usage"
 ---
 
 Check remaining AI credits without generating a logo.
@@ -9,7 +9,7 @@ Check remaining AI credits without generating a logo.
 ## Request
 
 <ParamField header="Authorization" type="string" required>
-  `Bearer <api_key>` — Studio API key (`ll_live_…`).
+  `Bearer <api_key>` - Studio API key (`ll_live_…`).
 </ParamField>
 
 <RequestExample>
@@ -44,7 +44,7 @@ curl "https://logolattice.com/api/v1/logos/usage" \
 </ResponseField>
 
 <ResponseField name="limit" type="integer">
-  Deprecated — prefer `monthlyLimit` for display.
+  Deprecated - prefer `monthlyLimit` for display.
 </ResponseField>
 
 <ResponseField name="resetsAt" type="string">
@@ -69,10 +69,10 @@ curl "https://logolattice.com/api/v1/logos/usage" \
 
 ## HTTP status codes
 
-| Status | When |
-| --- | --- |
-| `200` | Success |
-| `401` | Missing, invalid, or revoked Bearer token |
-| `403` | Account is not Studio |
+| Status | When                                      |
+| ------ | ----------------------------------------- |
+| `200`  | Success                                   |
+| `401`  | Missing, invalid, or revoked Bearer token |
+| `403`  | Account is not Studio                     |
 
 Auth errors use the same shape as [Generate logo](/api-reference/studio-logo-api/generate-logo). See [Errors](/api-reference/studio-logo-api/errors).

@@ -8,17 +8,17 @@ You can attach an optional reference image to `POST /api/v1/logos` to steer pale
 
 ## Request fields
 
-| Field | Required | Description |
-| --- | --- | --- |
-| `referenceImageBase64` | No | Base64-encoded image bytes |
-| `referenceMimeType` | Yes, when base64 is set | `image/png`, `image/jpeg`, or `image/webp` |
+| Field                  | Required                | Description                                |
+| ---------------------- | ----------------------- | ------------------------------------------ |
+| `referenceImageBase64` | No                      | Base64-encoded image bytes                 |
+| `referenceMimeType`    | Yes, when base64 is set | `image/png`, `image/jpeg`, or `image/webp` |
 
 ## Limits
 
-| Limit | Value |
-| --- | --- |
-| Max decoded size | **4 MB** |
-| Supported types | PNG, JPEG, WebP |
+| Limit            | Value           |
+| ---------------- | --------------- |
+| Max decoded size | **4 MB**        |
+| Supported types  | PNG, JPEG, WebP |
 
 ## Privacy
 
@@ -26,7 +26,7 @@ Reference images are sent to the model for the single generation request. They a
 
 ## Prompt guidance
 
-When using a reference image, say in `prompt` what to borrow and what to simplify—for example palette and silhouette, not every detail of the source image.
+When using a reference image, say in `prompt` what to borrow and what to simplify-for example palette and silhouette, not every detail of the source image.
 
 ```bash
 curl -X POST "https://logolattice.com/api/v1/logos" \

@@ -1,19 +1,19 @@
 ---
-title: 'Visibility'
-description: 'Show different content to humans and AI agents'
-icon: 'eye'
+title: "Visibility"
+description: "Show different content to humans and AI agents"
+icon: "eye"
 ---
 
 The `Visibility` component lets a single page serve two audiences: humans reading on the web and AI agents processing the Markdown output. Content marked `for="humans"` appears on the rendered page but is excluded from Markdown exports. Content marked `for="agents"` is hidden on the web but included in Markdown.
 
-This means you can write conversational, UI-centric instructions for humans and structured, machine-readable instructions for AI — without maintaining two separate pages.
+This means you can write conversational, UI-centric instructions for humans and structured, machine-readable instructions for AI - without maintaining two separate pages.
 
 ## How it works
 
 Mintlify serves every page at two URLs:
 
-- `https://docs.example.com/page` — the rendered site, for humans
-- `https://docs.example.com/page.md` — the raw Markdown, for AI agents
+- `https://docs.example.com/page` - the rendered site, for humans
+- `https://docs.example.com/page.md` - the raw Markdown, for AI agents
 
 `Visibility` controls what appears at each URL.
 
@@ -22,12 +22,8 @@ Mintlify serves every page at two URLs:
 ```mdx
 <Visibility for="humans">
   <Steps>
-    <Step title="Open the dashboard">
-      Navigate to [dashboard.example.com](https://dashboard.example.com) and sign in.
-    </Step>
-    <Step title="Create an API key">
-      Go to **Settings → API Keys** and click **New key**.
-    </Step>
+    <Step title="Open the dashboard">Navigate to [dashboard.example.com](https://dashboard.example.com) and sign in.</Step>
+    <Step title="Create an API key">Go to **Settings → API Keys** and click **New key**.</Step>
   </Steps>
 </Visibility>
 
@@ -44,8 +40,7 @@ Human readers see the step-by-step UI walkthrough. AI agents processing the Mark
 ## Props
 
 <ResponseField name="for" type='"humans" | "agents"' required>
-  - `"humans"` — visible on the rendered web page, excluded from `.md` export
-  - `"agents"` — hidden on the rendered web page, included in `.md` export
+  - `"humans"` - visible on the rendered web page, excluded from `.md` export - `"agents"` - hidden on the rendered web page, included in `.md` export
 </ResponseField>
 
 ## When to use it
@@ -79,7 +74,6 @@ Human readers see the step-by-step UI walkthrough. AI agents processing the Mark
 </Visibility>
 
 <Prompt description="Ask about authentication" icon="lock">
-  Explain how authentication works in this API and show me example code for
-  getting a token and making an authenticated request.
+  Explain how authentication works in this API and show me example code for getting a token and making an authenticated request.
 </Prompt>
 ```

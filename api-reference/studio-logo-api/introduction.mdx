@@ -4,11 +4,9 @@ description: Generate vector logos programmatically with Logo Lattice Studio
 icon: sparkles
 ---
 
-The **Studio Logo API** lets [Logo Lattice Studio](https://logolattice.com) subscribers generate vector logos from a text prompt—the same AI as the in-editor **Describe** feature.
+The **Studio Logo API** lets [Logo Lattice Studio](https://logolattice.com) subscribers generate vector logos from a text prompt-the same AI as the in-editor **Describe** feature.
 
-<Warning>
-  This API is available only to **Logo Lattice Studio** subscribers. Free accounts cannot create API keys or call these endpoints.
-</Warning>
+<Warning>This API is available only to **Logo Lattice Studio** subscribers. Free accounts cannot create API keys or call these endpoints.</Warning>
 
 ## What each generation does
 
@@ -16,34 +14,34 @@ Each successful `POST /api/v1/logos` request:
 
 1. **Consumes one Studio AI credit** from your monthly pool (shared with Describe and AI stylise in the editor).
 2. **Saves a cloud project** on your account.
-3. **Returns production-ready SVG**—the same output as **Export → Download SVG** in the editor.
+3. **Returns production-ready SVG**-the same output as **Export → Download SVG** in the editor.
 4. **Returns an `editUrl`** so you can continue editing in the browser.
 
 ## Base URL
 
-| | |
-| --- | --- |
+|            |                           |
+| ---------- | ------------------------- |
 | Production | `https://logolattice.com` |
-| API prefix | `/api/v1` |
+| API prefix | `/api/v1`                 |
 
 Example full URL: `https://logolattice.com/api/v1/logos`
 
 ## What the API returns (and does not)
 
-| Returns | Does not return |
-| --- | --- |
-| SVG string | PNG or other raster formats |
-| `editUrl` and `projectId` | Raw `.logolattice` project JSON |
-| Credit usage after generation | Anonymous public editor links |
+| Returns                       | Does not return                 |
+| ----------------------------- | ------------------------------- |
+| SVG string                    | PNG or other raster formats     |
+| `editUrl` and `projectId`     | Raw `.logolattice` project JSON |
+| Credit usage after generation | Anonymous public editor links   |
 
 Integrators who need editable source files should open `editUrl` while signed in as the API key owner.
 
 ## What this API is not
 
-- **Not a generic image generator** — output is Logo Lattice vector geometry as SVG.
-- **No PNG/raster export via API** — use the SVG response, or open `editUrl` and export in the editor.
-- **No session or cookie auth on v1 routes** — API keys only (`Authorization: Bearer`).
-- **`editUrl` is not a public link** — the Studio user must be signed in to edit.
+- **Not a generic image generator** - output is Logo Lattice vector geometry as SVG.
+- **No PNG/raster export via API** - use the SVG response, or open `editUrl` and export in the editor.
+- **No session or cookie auth on v1 routes** - API keys only (`Authorization: Bearer`).
+- **`editUrl` is not a public link** - the Studio user must be signed in to edit.
 
 ## Next steps
 

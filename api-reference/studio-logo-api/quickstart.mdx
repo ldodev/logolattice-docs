@@ -11,9 +11,7 @@ Generate a logo in three steps: set your API key, call the API, and use the resp
 - A [Logo Lattice Studio](https://logolattice.com) subscription
 - An API key from [Studio → API keys](https://logolattice.com/studio/api-keys)
 
-<Warning>
-  Never commit API keys to source control. Use environment variables.
-</Warning>
+<Warning>Never commit API keys to source control. Use environment variables.</Warning>
 
 ## 1. Set your API key
 
@@ -35,12 +33,12 @@ curl -X POST "https://logolattice.com/api/v1/logos" \
 
 The JSON body includes:
 
-| Field | Use |
-| --- | --- |
-| `svg` | Write to a `.svg` file or pass to your design pipeline |
-| `editUrl` | Open in the browser while signed in to refine the mark |
-| `projectId` | Reference the saved cloud project |
-| `usage` | See remaining AI credits after this generation |
+| Field       | Use                                                    |
+| ----------- | ------------------------------------------------------ |
+| `svg`       | Write to a `.svg` file or pass to your design pipeline |
+| `editUrl`   | Open in the browser while signed in to refine the mark |
+| `projectId` | Reference the saved cloud project                      |
+| `usage`     | See remaining AI credits after this generation         |
 
 Save the SVG:
 
@@ -65,6 +63,6 @@ curl "https://logolattice.com/api/v1/logos/usage" \
 
 ## Next steps
 
-- [Generate logo](/api-reference/studio-logo-api/generate-logo) — full request and response reference
-- [Best practices](/api-reference/studio-logo-api/best-practices) — write effective prompts
-- [Reference images](/api-reference/studio-logo-api/reference-images) — optional palette and composition hints
+- [Generate logo](/api-reference/studio-logo-api/generate-logo) - full request and response reference
+- [Best practices](/api-reference/studio-logo-api/best-practices) - write effective prompts
+- [Reference images](/api-reference/studio-logo-api/reference-images) - optional palette and composition hints

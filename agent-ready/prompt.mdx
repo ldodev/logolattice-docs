@@ -1,7 +1,7 @@
 ---
-title: 'Prompt component'
-description: 'Embed shareable AI prompts readers can copy or open in Cursor'
-icon: 'robot'
+title: "Prompt component"
+description: "Embed shareable AI prompts readers can copy or open in Cursor"
+icon: "robot"
 ---
 
 The `Prompt` component displays a pre-built AI prompt with one-click actions to copy it to the clipboard or open it directly in Cursor. It's ideal for any docs page where you want to hand readers a ready-to-use prompt.
@@ -9,14 +9,14 @@ The `Prompt` component displays a pre-built AI prompt with one-click actions to 
 ## Basic usage
 
 <Prompt description="Summarize this API endpoint">
-You are a technical writer. Given the following API endpoint documentation, write a one-paragraph summary that explains what the endpoint does, what inputs it requires, and what it returns. Be concise and use plain language.
+  You are a technical writer. Given the following API endpoint documentation, write a one-paragraph summary that explains what the endpoint does, what inputs it requires, and what it returns. Be
+  concise and use plain language.
 </Prompt>
 
 ```mdx
 <Prompt description="Summarize this API endpoint">
-You are a technical writer. Given the following API endpoint documentation,
-write a one-paragraph summary that explains what the endpoint does, what
-inputs it requires, and what it returns. Be concise and use plain language.
+  You are a technical writer. Given the following API endpoint documentation, write a one-paragraph summary that explains what the endpoint does, what inputs it requires, and what it returns. Be
+  concise and use plain language.
 </Prompt>
 ```
 
@@ -24,26 +24,14 @@ inputs it requires, and what it returns. Be concise and use plain language.
 
 Add `actions={["copy", "cursor"]}` to also surface an "Open in Cursor" button. This is especially useful for prompts readers will use in their editor.
 
-<Prompt
-  description="Generate a typed API client"
-  icon="code"
-  actions={["copy", "cursor"]}
->
-You are an expert TypeScript developer. Given the following OpenAPI specification, generate a fully-typed API client using native fetch. Include:
-- A base client class with configurable baseUrl and auth headers
-- One method per endpoint, with typed request parameters and response types
-- JSDoc comments on each method
-Do not use any third-party HTTP libraries.
+<Prompt description="Generate a typed API client" icon="code" actions={["copy", "cursor"]}>
+  You are an expert TypeScript developer. Given the following OpenAPI specification, generate a fully-typed API client using native fetch. Include: - A base client class with configurable baseUrl and
+  auth headers - One method per endpoint, with typed request parameters and response types - JSDoc comments on each method Do not use any third-party HTTP libraries.
 </Prompt>
 
 ```mdx
-<Prompt
-  description="Generate a typed API client"
-  icon="code"
-  actions={["copy", "cursor"]}
->
-You are an expert TypeScript developer. Given the following OpenAPI
-specification, generate a fully-typed API client using native fetch...
+<Prompt description="Generate a typed API client" icon="code" actions={["copy", "cursor"]}>
+  You are an expert TypeScript developer. Given the following OpenAPI specification, generate a fully-typed API client using native fetch...
 </Prompt>
 ```
 
@@ -69,7 +57,7 @@ specification, generate a fully-typed API client using native fetch...
 
 The `Prompt` component works well anywhere you're teaching readers to work with AI:
 
-- **Quickstart guides** — give readers a prompt to generate their first integration
-- **API reference pages** — include a prompt for generating client code from the spec
-- **Troubleshooting guides** — embed a debugging prompt readers can run against their own error logs
-- **Conceptual pages** — add a prompt for exploring the topic further with an AI assistant
+- **Quickstart guides** - give readers a prompt to generate their first integration
+- **API reference pages** - include a prompt for generating client code from the spec
+- **Troubleshooting guides** - embed a debugging prompt readers can run against their own error logs
+- **Conceptual pages** - add a prompt for exploring the topic further with an AI assistant

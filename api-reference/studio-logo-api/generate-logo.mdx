@@ -1,7 +1,7 @@
 ---
 title: Generate logo
-description: POST /api/v1/logos — create a vector logo from a text prompt
-openapi: 'POST /api/v1/logos'
+description: POST /api/v1/logos - create a vector logo from a text prompt
+openapi: "POST /api/v1/logos"
 ---
 
 Generate a logo from a text brief. Returns SVG, a cloud `projectId`, and an `editUrl` to continue in the editor.
@@ -9,7 +9,7 @@ Generate a logo from a text brief. Returns SVG, a cloud `projectId`, and an `edi
 ## Request
 
 <ParamField header="Authorization" type="string" required>
-  `Bearer <api_key>` — Studio API key (`ll_live_…`).
+  `Bearer <api_key>` - Studio API key (`ll_live_…`).
 </ParamField>
 
 <ParamField header="Content-Type" type="string" required>
@@ -55,7 +55,8 @@ curl -X POST "https://logolattice.com/api/v1/logos" \
 ## Response
 
 <ResponseField name="svg" type="string" required>
-  Full SVG document with clean paths. Transparent artboard; suitable for web, print, and design tools. Server-side export. Web fonts in text logos may differ slightly from the browser editor when custom fonts were used.
+  Full SVG document with clean paths. Transparent artboard; suitable for web, print, and design tools. Server-side export. Web fonts in text logos may differ slightly from the browser editor when
+  custom fonts were used.
 </ResponseField>
 
 <ResponseField name="editUrl" type="string" required>
@@ -91,7 +92,7 @@ curl -X POST "https://logolattice.com/api/v1/logos" \
 </ResponseField>
 
 <ResponseField name="usage.limit" type="integer">
-  Deprecated — prefer `monthlyLimit` for display.
+  Deprecated - prefer `monthlyLimit` for display.
 </ResponseField>
 
 <ResponseField name="usage.resetsAt" type="string">
@@ -137,14 +138,14 @@ curl -X POST "https://logolattice.com/api/v1/logos" \
 
 ## HTTP status codes
 
-| Status | When |
-| --- | --- |
-| `200` | Success |
-| `400` | Invalid JSON, validation failed, parse error, empty model result, or cloud project limit |
-| `401` | Missing, invalid, or revoked Bearer token |
-| `403` | Account is not Studio |
-| `429` | No AI credits remaining |
-| `502` | Upstream model failure |
-| `503` | AI not configured on server |
+| Status | When                                                                                     |
+| ------ | ---------------------------------------------------------------------------------------- |
+| `200`  | Success                                                                                  |
+| `400`  | Invalid JSON, validation failed, parse error, empty model result, or cloud project limit |
+| `401`  | Missing, invalid, or revoked Bearer token                                                |
+| `403`  | Account is not Studio                                                                    |
+| `429`  | No AI credits remaining                                                                  |
+| `502`  | Upstream model failure                                                                   |
+| `503`  | AI not configured on server                                                              |
 
 See [Errors](/api-reference/studio-logo-api/errors) for `code` values and examples.
