@@ -67,6 +67,27 @@ data = response.json()
 print(data["remaining"], data["resetsAt"])
 ```
 
+```php PHP
+<?php
+
+$apiKey = getenv('LOGO_LATTICE_API_KEY');
+
+$ch = curl_init('https://logolattice.com/api/v1/logos/usage');
+curl_setopt_array($ch, [
+    CURLOPT_RETURNTRANSFER => true,
+    CURLOPT_HTTPHEADER => [
+        'Authorization: Bearer ' . $apiKey,
+    ],
+]);
+
+$raw = curl_exec($ch);
+curl_close($ch);
+
+$data = json_decode($raw, true);
+echo $data['remaining'] . PHP_EOL;
+echo $data['resetsAt'] . PHP_EOL;
+```
+
 </RequestExample>
 
 ## Response
