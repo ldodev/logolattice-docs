@@ -29,7 +29,7 @@
         "tab": "API reference",
         "groups": [
           {
-            "group": "Describe API",
+            "group": "Logo Lattice API",
             "openapi": "api-reference/describe-api/openapi.json",
             "pages": [
               "api-reference/describe-api/introduction",
