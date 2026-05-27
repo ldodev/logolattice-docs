@@ -12,11 +12,59 @@ Check remaining AI credits without generating a logo.
   `Bearer <api_key>` - Studio API key (`ll_live_…`).
 </ParamField>
 
-<RequestExample>
+<RequestExample dropdown>
 
-```bash curl
+```typescript TypeScript
+interface UsageResponse {
+  monthlyUsed: number;
+  monthlyLimit: number;
+  monthlyRemaining: number;
+  bonusCredits: number;
+  remaining: number;
+  limit: number;
+  resetsAt: string;
+}
+
+const response = await fetch("https://logolattice.com/api/v1/logos/usage", {
+  headers: {
+    Authorization: `Bearer ${process.env.LOGO_LATTICE_API_KEY!}`,
+  },
+});
+
+const data = (await response.json()) as UsageResponse;
+console.log(data.remaining, data.resetsAt);
+```
+
+```bash Bash
 curl "https://logolattice.com/api/v1/logos/usage" \
   -H "Authorization: Bearer $LOGO_LATTICE_API_KEY"
+```
+
+```javascript JavaScript
+const response = await fetch("https://logolattice.com/api/v1/logos/usage", {
+  headers: {
+    Authorization: `Bearer ${process.env.LOGO_LATTICE_API_KEY}`,
+  },
+});
+
+const data = await response.json();
+console.log(data.remaining, data.resetsAt);
+```
+
+```python Python
+import os
+import requests
+
+response = requests.get(
+    "https://logolattice.com/api/v1/logos/usage",
+    headers={
+        "Authorization": f"Bearer {os.environ['LOGO_LATTICE_API_KEY']}",
+    },
+    timeout=30,
+)
+
+data = response.json()
+print(data["remaining"], data["resetsAt"])
 ```
 
 </RequestExample>

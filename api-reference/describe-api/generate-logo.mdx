@@ -30,27 +30,174 @@ Generate a logo from a text brief. Returns SVG, a cloud `projectId`, and an `edi
   Required when `referenceImageBase64` is set. One of: `image/png`, `image/jpeg`, `image/webp`.
 </ParamField>
 
-<RequestExample>
+<Tabs>
+  <Tab title="Minimal">
+    <RequestExample dropdown>
 
-```bash curl
-curl -X POST "https://logolattice.com/api/v1/logos" \
-  -H "Authorization: Bearer $LOGO_LATTICE_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{"prompt":"Isometric teal mountain mark, minimal facets, square grid"}'
-```
+    ```typescript TypeScript
+    interface GenerateLogoResponse {
+      svg: string;
+      editUrl: string;
+      projectId: string;
+    }
 
-```bash curl Reference image
-curl -X POST "https://logolattice.com/api/v1/logos" \
-  -H "Authorization: Bearer $LOGO_LATTICE_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "prompt": "Match the teal palette and triangular silhouette, simplify to an isometric lattice mark",
-    "referenceImageBase64": "'$(base64 -i reference.png | tr -d '\n')'",
-    "referenceMimeType": "image/png"
-  }'
-```
+    const response = await fetch("https://logolattice.com/api/v1/logos", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${process.env.LOGO_LATTICE_API_KEY!}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        prompt: "Isometric teal mountain mark, minimal facets, square grid",
+      }),
+    });
 
-</RequestExample>
+    const data = (await response.json()) as GenerateLogoResponse;
+    console.log(data.svg, data.editUrl);
+    ```
+
+    ```bash Bash
+    curl -X POST "https://logolattice.com/api/v1/logos" \
+      -H "Authorization: Bearer $LOGO_LATTICE_API_KEY" \
+      -H "Content-Type: application/json" \
+      -d '{"prompt":"Isometric teal mountain mark, minimal facets, square grid"}'
+    ```
+
+    ```javascript JavaScript
+    const response = await fetch("https://logolattice.com/api/v1/logos", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${process.env.LOGO_LATTICE_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        prompt: "Isometric teal mountain mark, minimal facets, square grid",
+      }),
+    });
+
+    const data = await response.json();
+    console.log(data.svg, data.editUrl);
+    ```
+
+    ```python Python
+    import os
+    import requests
+
+    response = requests.post(
+        "https://logolattice.com/api/v1/logos",
+        headers={
+            "Authorization": f"Bearer {os.environ['LOGO_LATTICE_API_KEY']}",
+            "Content-Type": "application/json",
+        },
+        json={
+            "prompt": "Isometric teal mountain mark, minimal facets, square grid",
+        },
+        timeout=60,
+    )
+
+    data = response.json()
+    print(data["svg"], data["editUrl"])
+    ```
+
+    </RequestExample>
+
+  </Tab>
+  <Tab title="With reference image">
+    <RequestExample dropdown>
+
+    ```bash Bash
+    curl -X POST "https://logolattice.com/api/v1/logos" \
+      -H "Authorization: Bearer $LOGO_LATTICE_API_KEY" \
+      -H "Content-Type: application/json" \
+      -d '{
+        "prompt": "Match the teal palette and triangular silhouette, simplify to an isometric lattice mark",
+        "referenceImageBase64": "'$(base64 -i reference.png | tr -d '\n')'",
+        "referenceMimeType": "image/png"
+      }'
+    ```
+
+    ```javascript JavaScript
+    import { readFileSync } from "node:fs";
+
+    const referenceImageBase64 = readFileSync("reference.png").toString("base64");
+
+    const response = await fetch("https://logolattice.com/api/v1/logos", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${process.env.LOGO_LATTICE_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        prompt:
+          "Match the teal palette and triangular silhouette, simplify to an isometric lattice mark",
+        referenceImageBase64,
+        referenceMimeType: "image/png",
+      }),
+    });
+
+    const data = await response.json();
+    console.log(data.projectId, data.editUrl);
+    ```
+
+    ```typescript TypeScript
+    import { readFileSync } from "node:fs";
+
+    interface GenerateLogoResponse {
+      svg: string;
+      editUrl: string;
+      projectId: string;
+    }
+
+    const referenceImageBase64 = readFileSync("reference.png").toString("base64");
+
+    const response = await fetch("https://logolattice.com/api/v1/logos", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${process.env.LOGO_LATTICE_API_KEY!}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        prompt:
+          "Match the teal palette and triangular silhouette, simplify to an isometric lattice mark",
+        referenceImageBase64,
+        referenceMimeType: "image/png",
+      }),
+    });
+
+    const data = (await response.json()) as GenerateLogoResponse;
+    console.log(data.projectId, data.editUrl);
+    ```
+
+    ```python Python
+    import base64
+    import os
+    import requests
+
+    with open("reference.png", "rb") as f:
+        reference_image_base64 = base64.b64encode(f.read()).decode("utf-8")
+
+    response = requests.post(
+        "https://logolattice.com/api/v1/logos",
+        headers={
+            "Authorization": f"Bearer {os.environ['LOGO_LATTICE_API_KEY']}",
+            "Content-Type": "application/json",
+        },
+        json={
+            "prompt": "Match the teal palette and triangular silhouette, simplify to an isometric lattice mark",
+            "referenceImageBase64": reference_image_base64,
+            "referenceMimeType": "image/png",
+        },
+        timeout=60,
+    )
+
+    data = response.json()
+    print(data["projectId"], data["editUrl"])
+    ```
+
+    </RequestExample>
+
+  </Tab>
+</Tabs>
 
 ## Response
 
