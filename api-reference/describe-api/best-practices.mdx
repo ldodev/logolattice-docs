@@ -28,6 +28,16 @@ Example:
 Isometric amber fox head, 6–8 facets, warm palette, clean silhouette for app icon
 ```
 
+## Pass brand colours explicitly
+
+The API does not load Studio brands by ID. When you have a customer or product palette, send `brandName`, `brandColors`, and optionally `referenceColors` as hex values, the same fields the editor sends after a user picks a brand and colour reference.
+
+- **All brand colours** (editor): put the full palette in both `brandColors` and `referenceColors`.
+- **Single swatch** (editor): full palette in `brandColors`, one hex in `referenceColors`.
+- **Softer guidance**: send only `brandColors` (and optional `brandName`) without `referenceColors` so the model prefers the palette unless the brief conflicts.
+
+Agents and MCP integrations can map palette hex from customer brand guidelines into these fields.
+
 ## Use reference images deliberately
 
 When you send `referenceImageBase64`, state in the prompt:

@@ -17,6 +17,8 @@ Each successful `POST /api/v1/logos` request:
 3. **Returns production-ready SVG**-the same output as **Export → Download SVG** in the editor.
 4. **Returns an `editUrl`** so you can continue editing in the browser.
 
+Optionally include `brandName`, `brandColors`, and `referenceColors` to steer palette the same way as **Describe** in the editor. Pass hex colours in the JSON body. The API does not resolve Studio brands by ID.
+
 ## Base URL
 
 |            |                           |

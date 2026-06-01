@@ -185,6 +185,30 @@
               "image/webp"
             ],
             "description": "Required when referenceImageBase64 is set."
+          },
+          "brandName": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64,
+            "description": "Optional brand label shown in the colour-direction prompt."
+          },
+          "brandColors": {
+            "type": "array",
+            "maxItems": 5,
+            "items": {
+              "type": "string",
+              "pattern": "^#?([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$"
+            },
+            "description": "Optional full brand palette (max 5 unique hex colours)."
+          },
+          "referenceColors": {
+            "type": "array",
+            "maxItems": 5,
+            "items": {
+              "type": "string",
+              "pattern": "^#?([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$"
+            },
+            "description": "Optional subset to emphasize in fills and accents; same hex rules as brandColors."
           }
         }
       },

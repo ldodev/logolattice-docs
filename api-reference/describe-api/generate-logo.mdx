@@ -30,7 +30,128 @@ Generate a logo from a text brief. Returns SVG, a cloud `projectId`, and an `edi
   Required when `referenceImageBase64` is set. One of: `image/png`, `image/jpeg`, `image/webp`.
 </ParamField>
 
+<ParamField body="brandName" type="string">
+  Optional label for the palette in the model prompt (for example your Studio brand name). **1–64 characters** after trim. Ignored if empty or over 64 characters. Has no effect unless `brandColors` and/or `referenceColors` are provided.
+</ParamField>
+
+<ParamField body="brandColors" type="string[]">
+  Optional full brand palette. Up to **5** unique valid hex colours after normalization. See [Colour format](#colour-format) below.
+</ParamField>
+
+<ParamField body="referenceColors" type="string[]">
+  Optional colours the model should emphasize in fills and accents. Up to **5** unique valid hex colours; same format rules as `brandColors`.
+</ParamField>
+
+### Colour format
+
+| Rule | Behaviour |
+| --- | --- |
+| Valid formats | `#RGB`, `#RRGGBB`, or without `#` (for example `0d9488`) |
+| Normalization | Server expands 3-digit hex and stores lowercase `#rrggbb` |
+| Duplicates | Removed; order preserved for the first occurrence |
+| Array length | More than 5 entries → only the first 5 unique valid colours are kept |
+| Invalid entry | **400** with Zod `fieldErrors` on `brandColors` or `referenceColors`: `"Invalid hex colour."` |
+
+### How brand fields affect generation
+
+Optional colour fields are appended to the user message as a **Colour direction** block, the same logic as **Describe** in the editor:
+
+| Request | Prompt block |
+| --- | --- |
+| `brandName` + `brandColors` | `Brand palette ({brandName}): #..., #...` |
+| `brandColors` only | `Brand palette: #..., #...` |
+| `referenceColors` | `Use these hex colours prominently in fills and accents unless the brief clearly conflicts: ...` |
+| `brandColors` without `referenceColors` | Also adds: prefer the brand palette unless the brief clearly conflicts |
+| `brandName` alone (no colour arrays) | No colour block is added |
+
+Combine `referenceImageBase64` with brand fields when you want both visual reference and explicit palette control.
+
+### Brand colours in the API
+
+The Logo API uses the same colour-direction logic as **Describe** in the editor. The API does **not** load brands from your Studio account. Pass `brandName`, `brandColors`, and optionally `referenceColors` explicitly. Integrations should read colours from their own config or from Studio brand data they already store. There is no `GET /studio/brands` on the Logo API.
+
+| Describe UI | API body |
+| --- | --- |
+| No brand | Omit `brandName`, `brandColors`, `referenceColors` |
+| Brand selected, colour reference **None** | Omit all three (or omit `referenceColors` and do not send `brandColors` if you want no palette) |
+| **All brand colours** | `brandName`, `brandColors` = full palette, `referenceColors` = same as `brandColors` |
+| Single swatch | `brandName`, `brandColors` = full palette, `referenceColors` = `[that hex]` |
+
+Palette context only (softer colour guidance, no `referenceColors`):
+
+```json
+{
+  "prompt": "Geometric fox head, warm palette",
+  "brandName": "Acme",
+  "brandColors": ["#f59e0b", "#1c1917", "#ffffff"]
+}
+```
+
+<Note>The response body (`svg`, `editUrl`, `projectId`, `usage`) is unchanged when you add brand colour fields.</Note>
+
 <RequestExample dropdown>
+
+```bash Minimal · Bash
+curl -X POST "https://logolattice.com/api/v1/logos" \
+  -H "Authorization: Bearer $LOGO_LATTICE_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"prompt":"Isometric teal mountain mark, minimal facets"}'
+```
+
+```bash With brand palette · Bash
+curl -X POST "https://logolattice.com/api/v1/logos" \
+  -H "Authorization: Bearer $LOGO_LATTICE_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "prompt": "Isometric mountain mark, minimal facets, app-icon friendly",
+    "brandName": "Acme",
+    "brandColors": ["#0d9488", "#ffffff", "#134e4a"],
+    "referenceColors": ["#0d9488", "#ffffff"]
+  }'
+```
+
+```javascript With brand palette · JavaScript
+const response = await fetch("https://logolattice.com/api/v1/logos", {
+  method: "POST",
+  headers: {
+    Authorization: `Bearer ${process.env.LOGO_LATTICE_API_KEY}`,
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    prompt: "Isometric mountain mark, minimal facets, app-icon friendly",
+    brandName: "Acme",
+    brandColors: ["#0d9488", "#ffffff", "#134e4a"],
+    referenceColors: ["#0d9488", "#ffffff"],
+  }),
+});
+
+const data = await response.json();
+console.log(data.projectId, data.editUrl);
+```
+
+```python With brand palette · Python
+import os
+import requests
+
+response = requests.post(
+    "https://logolattice.com/api/v1/logos",
+    headers={
+        "Authorization": f"Bearer {os.environ['LOGO_LATTICE_API_KEY']}",
+        "Content-Type": "application/json",
+    },
+    json={
+        "prompt": "Isometric mountain mark, minimal facets, app-icon friendly",
+        "brandName": "Acme",
+        "brandColors": ["#0d9488", "#ffffff", "#134e4a"],
+        "referenceColors": ["#0d9488", "#ffffff"],
+    },
+    timeout=60,
+)
+
+data = response.json()
+print(data["projectId"], data["editUrl"])
+```
+
 
 ```javascript With image · JavaScript
 import { readFileSync } from "node:fs";
@@ -44,9 +165,12 @@ const response = await fetch("https://logolattice.com/api/v1/logos", {
     "Content-Type": "application/json",
   },
   body: JSON.stringify({
-    prompt: "Match the teal palette and triangular silhouette, simplify to an isometric lattice mark",
+    prompt: "Match the mood of the reference, simplified lattice mark",
     referenceImageBase64,
     referenceMimeType: "image/png",
+    brandName: "Acme",
+    brandColors: ["#0d9488", "#ffffff"],
+    referenceColors: ["#0d9488"],
   }),
 });
 
@@ -72,9 +196,12 @@ const response = await fetch("https://logolattice.com/api/v1/logos", {
     "Content-Type": "application/json",
   },
   body: JSON.stringify({
-    prompt: "Match the teal palette and triangular silhouette, simplify to an isometric lattice mark",
+    prompt: "Match the mood of the reference, simplified lattice mark",
     referenceImageBase64,
     referenceMimeType: "image/png",
+    brandName: "Acme",
+    brandColors: ["#0d9488", "#ffffff"],
+    referenceColors: ["#0d9488"],
   }),
 });
 
@@ -87,9 +214,12 @@ curl -X POST "https://logolattice.com/api/v1/logos" \
   -H "Authorization: Bearer $LOGO_LATTICE_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
-    "prompt": "Match the teal palette and triangular silhouette, simplify to an isometric lattice mark",
+    "prompt": "Match the mood of the reference, simplified lattice mark",
     "referenceImageBase64": "'$(base64 -i reference.png | tr -d '\n')'",
-    "referenceMimeType": "image/png"
+    "referenceMimeType": "image/png",
+    "brandName": "Acme",
+    "brandColors": ["#0d9488", "#ffffff"],
+    "referenceColors": ["#0d9488"]
   }'
 ```
 
@@ -108,9 +238,12 @@ response = requests.post(
         "Content-Type": "application/json",
     },
     json={
-        "prompt": "Match the teal palette and triangular silhouette, simplify to an isometric lattice mark",
+        "prompt": "Match the mood of the reference, simplified lattice mark",
         "referenceImageBase64": reference_image_base64,
         "referenceMimeType": "image/png",
+        "brandName": "Acme",
+        "brandColors": ["#0d9488", "#ffffff"],
+        "referenceColors": ["#0d9488"],
     },
     timeout=60,
 )
@@ -126,9 +259,12 @@ $apiKey = getenv('LOGO_LATTICE_API_KEY');
 $referenceImageBase64 = base64_encode(file_get_contents('reference.png'));
 
 $payload = json_encode([
-    'prompt' => 'Match the teal palette and triangular silhouette, simplify to an isometric lattice mark',
+    'prompt' => 'Match the mood of the reference, simplified lattice mark',
     'referenceImageBase64' => $referenceImageBase64,
     'referenceMimeType' => 'image/png',
+    'brandName' => 'Acme',
+    'brandColors' => ['#0d9488', '#ffffff'],
+    'referenceColors' => ['#0d9488'],
 ]);
 
 $ch = curl_init('https://logolattice.com/api/v1/logos');
@@ -241,7 +377,7 @@ echo $data['editUrl'] . PHP_EOL;
 | Status | When                                                                                     |
 | ------ | ---------------------------------------------------------------------------------------- |
 | `200`  | Success                                                                                  |
-| `400`  | Invalid JSON, validation failed, parse error, empty model result, or cloud project limit |
+| `400`  | Invalid JSON, validation failed (prompt, reference image, invalid hex in `brandColors`/`referenceColors`, `brandName` over 64 chars), parse error, empty model result, or cloud project limit |
 | `401`  | Missing, invalid, or revoked Bearer token                                                |
 | `403`  | Account is not Studio                                                                    |
 | `429`  | No AI credits remaining                                                                  |

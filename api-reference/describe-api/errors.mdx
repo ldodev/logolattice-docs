@@ -23,7 +23,7 @@ The `usage` object is included when relevant (for example quota errors), using t
 | Status | When |
 | --- | --- |
 | `200` | Success |
-| `400` | Invalid JSON, validation failed, parse error, empty model result, cloud project limit (rare for Studio) |
+| `400` | Invalid JSON, validation failed, parse error, empty model result, cloud project limit (rare for Studio), invalid hex in `brandColors`/`referenceColors`, or `brandName` over 64 characters |
 | `401` | Missing or invalid Bearer token, or revoked key |
 | `403` | Account is not Studio |
 | `429` | No AI credits remaining |
@@ -37,12 +37,29 @@ The `usage` object is included when relevant (for example quota errors), using t
 | `invalid_key` | `401` | Bad or missing API key |
 | `revoked` | `401` | Key was revoked |
 | `not_premium` | `403` | Studio subscription required |
-| `invalid_input` | `400` | Prompt or reference image validation failed |
+| `invalid_input` | `400` | Prompt, reference image, or brand colour validation failed |
 | `parse_error` | `400` | Model returned unusable logo data |
 | `project_limit_exceeded` | `400` | Cannot create cloud project (free-tier project cap) |
 | `limit_exceeded` | `429` | No AI generations left |
 | `upstream` | `502` | OpenAI or other upstream error |
 | `not_configured` | `503` | AI unavailable on server |
+
+## Example: invalid request (validation)
+
+When request parsing fails (for example an invalid hex in `referenceColors`), the response may include Zod `details`:
+
+```json
+{
+  "error": "Invalid request.",
+  "details": {
+    "fieldErrors": {
+      "referenceColors": ["Invalid hex colour."]
+    }
+  }
+}
+```
+
+Other **400** cases include `brandName` longer than 64 characters after trim and invalid entries in `brandColors`.
 
 ## Example: quota exceeded
 
