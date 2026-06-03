@@ -1,14 +1,18 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "Logo Lattice Describe API",
-    "description": "Generate vector logos programmatically from text prompts. Studio subscribers only.",
+    "title": "Logo Lattice API",
+    "description": "Programmatic logo generation for Logo Lattice Studio subscribers. Routes under /api/v1/logos share Bearer auth, AI quota, and JSON error shape.",
     "version": "1.0.0"
   },
   "servers": [
     {
       "url": "https://logolattice.com",
       "description": "Production"
+    },
+    {
+      "url": "http://localhost:3000",
+      "description": "Local"
     }
   ],
   "security": [
@@ -21,7 +25,7 @@
       "post": {
         "operationId": "generateLogo",
         "summary": "Generate a logo",
-        "description": "Generate a logo from a text brief and return SVG plus a deep link to continue editing.",
+        "description": "Generate a logo from a text brief. Default provider is Describe (openrouter): SVG plus cloud project and editUrl. Set provider to svg-paths for editable path SVG without a cloud project.",
         "x-mint": {
           "href": "/api-reference/describe-api/generate-logo"
         },
@@ -41,13 +45,20 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GenerateLogoResponse"
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/DescribeLogoResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/SvgPathsLogoResponse"
+                    }
+                  ]
                 }
               }
             }
           },
           "400": {
-            "description": "Invalid input or project limit",
+            "description": "Invalid input, parse error, or project limit",
             "content": {
               "application/json": {
                 "schema": {
@@ -57,7 +68,7 @@
             }
           },
           "401": {
-            "description": "Missing or invalid API key",
+            "description": "Missing, invalid, or revoked API key",
             "content": {
               "application/json": {
                 "schema": {
@@ -87,7 +98,7 @@
             }
           },
           "502": {
-            "description": "Upstream model failure",
+            "description": "Upstream provider failure",
             "content": {
               "application/json": {
                 "schema": {
@@ -97,7 +108,99 @@
             }
           },
           "503": {
-            "description": "AI not configured",
+            "description": "AI or SVG provider not configured",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/logos/svg-paths": {
+      "post": {
+        "operationId": "generateSvgPathsLogo",
+        "summary": "Generate SVG paths logo",
+        "description": "Dedicated SVG paths generation. Same request body as POST /api/v1/logos; provider is ignored. standard costs 1 credit; enhanced costs 2.",
+        "x-mint": {
+          "href": "/api-reference/describe-api/generate-svg-paths"
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GenerateLogoRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "SVG paths logo generated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SvgPathsLogoResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input or parse error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid, or revoked API key",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Studio subscription required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "No AI credits remaining",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Upstream provider failure",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "SVG provider not configured",
             "content": {
               "application/json": {
                 "schema": {
@@ -113,7 +216,7 @@
       "get": {
         "operationId": "getLogoUsage",
         "summary": "Get AI credit usage",
-        "description": "Check remaining AI credits without generating a logo.",
+        "description": "Read current AI quota without spending a credit.",
         "x-mint": {
           "href": "/api-reference/describe-api/get-usage"
         },
@@ -129,7 +232,7 @@
             }
           },
           "401": {
-            "description": "Missing or invalid API key",
+            "description": "Missing, invalid, or revoked API key",
             "content": {
               "application/json": {
                 "schema": {
@@ -157,40 +260,46 @@
       "bearerAuth": {
         "type": "http",
         "scheme": "bearer",
-        "description": "API key with prefix `ll_live_`"
+        "description": "Studio API key with prefix `ll_live_` (shown once when created in Studio → API keys)"
       }
     },
     "schemas": {
       "GenerateLogoRequest": {
         "type": "object",
-        "required": [
-          "prompt"
-        ],
+        "required": ["prompt"],
         "properties": {
           "prompt": {
             "type": "string",
             "minLength": 10,
             "maxLength": 800,
-            "description": "Logo brief describing style, subject, colours, and grid feel."
+            "description": "Logo brief after trimming (10–800 characters)."
+          },
+          "provider": {
+            "type": "string",
+            "enum": ["openrouter", "svg-paths"],
+            "default": "openrouter",
+            "description": "Generation backend. Only used on POST /api/v1/logos; ignored on /svg-paths."
+          },
+          "quality": {
+            "type": "string",
+            "enum": ["standard", "enhanced"],
+            "default": "standard",
+            "description": "SVG paths only. enhanced costs 2 credits."
           },
           "referenceImageBase64": {
             "type": "string",
-            "description": "Base64-encoded reference image (max 4 MB decoded)."
+            "description": "Base64-encoded reference image (1 byte – 4 MB decoded)."
           },
           "referenceMimeType": {
             "type": "string",
-            "enum": [
-              "image/png",
-              "image/jpeg",
-              "image/webp"
-            ],
+            "enum": ["image/png", "image/jpeg", "image/webp"],
             "description": "Required when referenceImageBase64 is set."
           },
           "brandName": {
             "type": "string",
             "minLength": 1,
             "maxLength": 64,
-            "description": "Optional brand label shown in the colour-direction prompt."
+            "description": "Optional brand label (1–64 characters after trim)."
           },
           "brandColors": {
             "type": "array",
@@ -199,7 +308,7 @@
               "type": "string",
               "pattern": "^#?([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$"
             },
-            "description": "Optional full brand palette (max 5 unique hex colours)."
+            "description": "Up to 5 hex colours (#RGB or #RRGGBB); normalized server-side."
           },
           "referenceColors": {
             "type": "array",
@@ -208,7 +317,7 @@
               "type": "string",
               "pattern": "^#?([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$"
             },
-            "description": "Optional subset to emphasize in fills and accents; same hex rules as brandColors."
+            "description": "Up to 5 hex colours to emphasize; same rules as brandColors."
           }
         }
       },
@@ -216,42 +325,81 @@
         "type": "object",
         "properties": {
           "monthlyUsed": {
-            "type": "integer"
+            "type": "integer",
+            "description": "Generations used this UTC calendar month (free tier)."
           },
           "monthlyLimit": {
-            "type": "integer"
+            "type": "integer",
+            "description": "Free monthly cap (10)."
           },
           "monthlyRemaining": {
-            "type": "integer"
+            "type": "integer",
+            "description": "Free generations left this month."
           },
           "bonusCredits": {
-            "type": "integer"
+            "type": "integer",
+            "description": "Top-up balance (does not expire)."
           },
           "remaining": {
-            "type": "integer"
+            "type": "integer",
+            "description": "Total available: monthlyRemaining + bonusCredits."
           },
           "limit": {
             "type": "integer",
-            "deprecated": true
+            "deprecated": true,
+            "description": "Alias of monthlyLimit."
           },
           "resetsAt": {
             "type": "string",
-            "format": "date-time"
+            "format": "date-time",
+            "description": "Start of next UTC month (ISO 8601)."
           }
         }
       },
-      "GenerateLogoResponse": {
+      "DescribeLogoResponse": {
         "type": "object",
         "properties": {
           "svg": {
-            "type": "string"
+            "type": "string",
+            "description": "Full SVG document (same idea as Export → Download SVG)."
           },
           "editUrl": {
             "type": "string",
-            "format": "uri"
+            "format": "uri",
+            "description": "Open while signed in to edit the cloud project."
           },
           "projectId": {
-            "type": "string"
+            "type": "string",
+            "description": "Cloud project ID."
+          },
+          "usage": {
+            "$ref": "#/components/schemas/Usage"
+          }
+        }
+      },
+      "SvgPathsLogoResponse": {
+        "type": "object",
+        "properties": {
+          "svg": {
+            "type": "string",
+            "description": "Editable path SVG."
+          },
+          "provider": {
+            "type": "string",
+            "enum": ["svg-paths"],
+            "description": "Always svg-paths."
+          },
+          "quality": {
+            "type": "string",
+            "enum": ["standard", "enhanced"]
+          },
+          "credits": {
+            "type": "integer",
+            "description": "Upstream-reported cost when available."
+          },
+          "generationId": {
+            "type": "string",
+            "description": "Persisted generation record ID when available."
           },
           "usage": {
             "$ref": "#/components/schemas/Usage"
@@ -269,6 +417,10 @@
           },
           "usage": {
             "$ref": "#/components/schemas/Usage"
+          },
+          "details": {
+            "type": "object",
+            "description": "Zod validation details (e.g. fieldErrors)."
           }
         }
       }

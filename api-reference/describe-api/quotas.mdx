@@ -1,45 +1,65 @@
 ---
 title: Quotas and billing
-description: AI credits, monthly resets, and top-ups for the Describe API
+description: Shared AI credits, monthly resets, and top-ups for the Logo Lattice API
 icon: gauge
 ---
 
-## Monthly credits
+## Shared credit pool
 
-Studio includes **10 AI generations per calendar month (UTC)**. That pool is **shared** across:
+Studio AI credits are **shared** across:
 
-- This API (`POST /api/v1/logos`)
-- In-editor **Describe**
-- In-editor **AI stylise**
+- `POST /api/v1/logos` (Describe / `openrouter` and SVG paths via `provider`)
+- `POST /api/v1/logos/svg-paths`
+- In-app **Describe**
+- In-app **Export → AI stylise**
+
+## Monthly allowance
+
+| Concept | Detail |
+| ------- | ------ |
+| Free monthly cap | **10** generations per **UTC calendar month** |
+| Top-ups | Bonus credits stack and **do not expire** |
+| Check balance | `GET /api/v1/logos/usage` (no credit cost) |
 
 Check your balance anytime with [`GET /api/v1/logos/usage`](/api-reference/describe-api/get-usage).
 
-## When credits are consumed
+## Credit cost per operation
 
-| Event | Credits |
-| --- | --- |
-| Successful `POST /api/v1/logos` | **1 credit** |
-| Failed generation (upstream or API error after a failed attempt) | Generally **no credit** (same as in-editor Describe) |
-| `GET /api/v1/logos/usage` | **0 credits** |
+| Operation | Credits |
+| --------- | ------- |
+| Describe / default `POST /api/v1/logos` (`openrouter`) | **1** per success |
+| SVG paths `quality: "standard"` | **1** |
+| SVG paths `quality: "enhanced"` | **2** |
+| `GET /api/v1/logos/usage` | **0** |
+
+Failed generations (upstream or API error after a failed attempt) generally **do not** consume a credit, same as in-editor Describe.
 
 ## When you are out of credits
 
-When `remaining` is `0`, `POST /api/v1/logos` returns **429** with `code: "limit_exceeded"` until either:
+When `remaining` is `0`, `POST` returns **429** with `code: "limit_exceeded"` and a `usage` object until either:
 
 - The monthly pool resets at `resetsAt` (UTC month boundary), or
 - You purchase a credit top-up in Studio.
 
-## Bonus credits
+Example message:
 
-Top-ups (**$5.99** for **30 credits**) add to `bonusCredits` and increase `remaining`. They do not change `monthlyLimit`.
+```json
+{
+  "error": "You have no AI generations left. Top up for 30 more, or wait until your free quota resets.",
+  "code": "limit_exceeded",
+  "usage": { "monthlyUsed": 10, "monthlyRemaining": 0, "remaining": 0 }
+}
+```
 
-Prefer `monthlyLimit` and `monthlyRemaining` for UI that shows the monthly allowance; use `remaining` for “can I generate now?” checks.
+## Usage fields
+
+Successful generations and `GET /usage` return the same usage shape. Prefer `monthlyLimit` and `monthlyRemaining` for monthly allowance UI; use `remaining` for “can I generate now?” checks.
+
+<Info>
+  The `limit` field is **deprecated** - it is an alias of `monthlyLimit`.
+</Info>
 
 ## Manage keys and usage
 
 - Create and revoke keys: [Studio → API keys](https://logolattice.com/studio/api-keys)
 - View usage on the same page and via the usage endpoint
-
-<Info>
-  The `limit` field in usage responses is **deprecated**. Use `monthlyLimit` for display.
-</Info>

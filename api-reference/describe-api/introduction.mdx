@@ -1,49 +1,87 @@
 ---
-title: Describe API
-description: Generate vector logos programmatically with Logo Lattice Studio
+title: Logo Lattice API
+description: Programmatic logo generation for Logo Lattice Studio subscribers
 icon: sparkles
 ---
 
-The **Describe API** lets [Logo Lattice Studio](https://logolattice.com) subscribers generate vector logos from a text prompt - the same AI as the in-editor **Describe** feature.
+The **Logo Lattice API** (`/api/v1`) lets [Logo Lattice Studio](https://logolattice.com) subscribers generate logos programmatically. All routes live under `/api/v1/logos` and share the same Bearer auth, AI quota pool, and JSON error shape.
 
 <Warning>This API is available only to **Logo Lattice Studio** subscribers. Free accounts cannot create API keys or call these endpoints.</Warning>
 
-## What each generation does
+## Base URLs
 
-Each successful `POST /api/v1/logos` request:
-
-1. **Consumes one Studio AI credit** from your monthly pool (shared with Describe and AI stylise in the editor).
-2. **Saves a cloud project** on your account.
-3. **Returns production-ready SVG**-the same output as **Export → Download SVG** in the editor.
-4. **Returns an `editUrl`** so you can continue editing in the browser.
-
-Optionally include `brandName`, `brandColors`, and `referenceColors` to steer palette the same way as **Describe** in the editor. Pass hex colours in the JSON body. The API does not resolve Studio brands by ID.
-
-## Base URL
-
-|            |                           |
-| ---------- | ------------------------- |
+| Environment | Base URL |
+| ----------- | -------- |
 | Production | `https://logolattice.com` |
-| API prefix | `/api/v1`                 |
+| Local | `http://localhost:3000` |
 
-Example full URL: `https://logolattice.com/api/v1/logos`
+API prefix: `/api/v1`. Example: `https://logolattice.com/api/v1/logos`
+
+The OpenAPI spec in this docs site powers Mintlify **API reference** and **Try it** for all logo routes.
+
+## Endpoints
+
+| Method | Path | Purpose |
+| ------ | ---- | ------- |
+| `POST` | `/api/v1/logos` | Generate a logo (default Describe + cloud project; optional SVG paths via `provider`) |
+| `POST` | `/api/v1/logos/svg-paths` | Dedicated SVG paths generation (no cloud project) |
+| `GET` | `/api/v1/logos/usage` | Read AI quota without spending a credit |
+
+## Choosing an endpoint
+
+| Need | Endpoint |
+| ---- | -------- |
+| Cloud project + `editUrl` (same as in-editor **Describe**) | `POST /api/v1/logos` (default, or `"provider": "openrouter"`) |
+| Editable path SVG only, no cloud project | `POST /api/v1/logos/svg-paths` **or** `POST /api/v1/logos` with `"provider": "svg-paths"` |
+| Check quota before batch jobs | `GET /api/v1/logos/usage` |
+
+## Providers
+
+| Provider | Behaviour | Credits |
+| -------- | --------- | ------- |
+| `openrouter` (default) | Same **Describe** flow as the editor: SVG + cloud project + `editUrl` | **1** per success |
+| `svg-paths` | Editable path SVG via dedicated upstream; no cloud project | **1** (`standard`) or **2** (`enhanced`) |
+
+Set `"provider": "svg-paths"` on the main route, or call [Generate SVG paths](/api-reference/describe-api/generate-svg-paths) directly.
+
+## Shared request body
+
+`POST /api/v1/logos` and `POST /api/v1/logos/svg-paths` accept the same JSON body. Required field: `prompt` (trimmed, **10–800** characters). Optional: `provider` (main route only), `quality` (SVG paths only), reference image fields, and brand palette fields. See [Generate logo](/api-reference/describe-api/generate-logo) for the full field reference.
+
+## AI quota (shared pool)
+
+Describe (default), SVG paths, in-app **Describe**, and **Export → AI stylise** all draw from the same credit pool. Studio includes **10** free generations per UTC calendar month; [top-ups](https://logolattice.com) add bonus credits that stack and do not expire.
+
+| Operation | Credits |
+| --------- | ------- |
+| `POST /api/v1/logos` (Describe / `openrouter`) | 1 |
+| `POST /api/v1/logos` or `/svg-paths` (`svg-paths`, `standard`) | 1 |
+| SVG paths `enhanced` | 2 |
+| `GET /api/v1/logos/usage` | 0 |
+
+Successful generations include an updated `usage` object. When out of credits, `POST` returns **429** with `code: "limit_exceeded"`. See [Quotas and billing](/api-reference/describe-api/quotas).
 
 ## What the API returns (and does not)
 
-| Returns                       | Does not return                 |
-| ----------------------------- | ------------------------------- |
-| SVG string                    | PNG or other raster formats     |
-| `editUrl` and `projectId`     | Raw `.logolattice` project JSON |
-| Credit usage after generation | Anonymous public editor links   |
+| Returns | Does not return |
+| ------- | --------------- |
+| SVG string | PNG or other raster formats |
+| `editUrl` and `projectId` (Describe only) | Raw `.logolattice` project JSON |
+| Quota snapshot after generation | Anonymous public editor links |
 
-Integrators who need editable source files should open `editUrl` while signed in as the API key owner.
+## CORS (browser clients)
+
+`OPTIONS` is supported on all logo routes. CORS middleware applies on `/api/v1/:path*`.
+
+Allowed origins include `*.logolattice.com`, Mintlify hosts, and `localhost`. Extra origins can be set with `LOGO_API_CORS_ORIGINS` (comma-separated).
+
+Preflight allows `GET`, `POST`, and `OPTIONS` with headers `Authorization` and `Content-Type`.
 
 ## What this API is not
 
-- **Not a generic image generator** - output is Logo Lattice vector geometry as SVG.
-- **No PNG/raster export via API** - use the SVG response, or open `editUrl` and export in the editor.
-- **No session or cookie auth on v1 routes** - API keys only (`Authorization: Bearer`).
-- **`editUrl` is not a public link** - the Studio user must be signed in to edit.
+- **In-app routes** such as `/api/ai/generate-logo` use session cookies, not API keys.
+- **OpenRouter’s** `https://openrouter.ai/api/v1` is unrelated.
+- **Not a generic image API** - output is Logo Lattice vector geometry as SVG.
 
 ## Next steps
 
@@ -53,5 +91,11 @@ Integrators who need editable source files should open `editUrl` while signed in
   </Card>
   <Card title="Quickstart" icon="bolt" href="/api-reference/describe-api/quickstart">
     Generate your first logo with curl.
+  </Card>
+  <Card title="Generate logo" icon="wand-magic-sparkles" href="/api-reference/describe-api/generate-logo">
+    Describe flow and shared request body.
+  </Card>
+  <Card title="SVG paths" icon="shapes" href="/api-reference/describe-api/generate-svg-paths">
+    Path-only generation without a cloud project.
   </Card>
 </CardGroup>

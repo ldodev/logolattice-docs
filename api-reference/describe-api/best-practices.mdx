@@ -1,6 +1,6 @@
 ---
 title: Best practices
-description: Write effective logo prompts for the Describe API
+description: Write effective logo prompts for the Logo Lattice API
 icon: lightbulb
 ---
 
@@ -55,6 +55,14 @@ Match the navy and gold palette from the reference; simplify to a square-grid le
 
 After trimming, keep prompts between **10 and 800 characters**. Shorter, specific briefs usually outperform long unstructured text.
 
+## Choose Describe vs SVG paths
+
+| Goal | Approach |
+| ---- | -------- |
+| Continue editing in Logo Lattice with a cloud project | Default `POST /api/v1/logos` (Describe) |
+| Path-only SVG for your own pipeline | `POST /api/v1/logos/svg-paths` or `"provider": "svg-paths"` |
+| Higher-fidelity paths (2 credits) | `"quality": "enhanced"` on SVG paths |
+
 ## Test in the editor first
 
-The API uses the same model as **Describe** in the editor. If a brief works well there, it will likely work via the API.
+Default Describe uses the same model as **Describe** in the editor. If a brief works well there, it will likely work via the API.

@@ -1,0 +1,103 @@
+---
+title: Generate SVG paths
+description: POST /api/v1/logos/svg-paths - editable path SVG without a cloud project
+openapi: "api-reference/describe-api/openapi.json POST /api/v1/logos/svg-paths"
+---
+
+Generate an editable path SVG via the dedicated SVG paths upstream. Uses the same JSON body as [Generate logo](/api-reference/describe-api/generate-logo), but **`provider` is ignored** (always SVG paths).
+
+## Credit cost
+
+| `quality`   | Credits |
+| ----------- | ------- |
+| `standard`  | **1**   |
+| `enhanced`  | **2**   |
+
+You can also set `"provider": "svg-paths"` on `POST /api/v1/logos` instead of calling this route.
+
+## Request
+
+<ParamField header="Authorization" type="string" required>
+  `Bearer <api_key>` - Studio API key (`ll_live_…`).
+</ParamField>
+
+<ParamField header="Content-Type" type="string" required>
+  `application/json`
+</ParamField>
+
+### Body
+
+Same fields as [Generate logo](/api-reference/describe-api/generate-logo#body). `provider` has no effect on this endpoint. Use `quality` to choose standard (1 credit) or enhanced (2 credits).
+
+<RequestExample dropdown>
+
+```bash Standard · Bash
+curl -X POST "https://logolattice.com/api/v1/logos/svg-paths" \
+  -H "Authorization: Bearer $LOGO_LATTICE_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"prompt":"Geometric mountain mark, teal and white, minimal paths","quality":"standard"}'
+```
+
+```bash Enhanced · Bash
+curl -X POST "https://logolattice.com/api/v1/logos/svg-paths" \
+  -H "Authorization: Bearer $LOGO_LATTICE_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"prompt":"Geometric mountain mark, teal and white, minimal paths","quality":"enhanced"}'
+```
+
+</RequestExample>
+
+## Response
+
+<ResponseField name="svg" type="string" required>
+  Full SVG document with editable paths. No cloud project is created.
+</ResponseField>
+
+<ResponseField name="provider" type="string" required>
+  Always `"svg-paths"`.
+</ResponseField>
+
+<ResponseField name="quality" type="string" required>
+  `"standard"` or `"enhanced"` - reflects the request.
+</ResponseField>
+
+<ResponseField name="credits" type="integer">
+  Optional upstream-reported credit cost for this generation.
+</ResponseField>
+
+<ResponseField name="generationId" type="string">
+  Optional ID of the persisted generation record.
+</ResponseField>
+
+<ResponseField name="usage" type="object" required>
+  Quota snapshot after this generation.
+</ResponseField>
+
+<ResponseExample>
+
+```json Success
+{
+  "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" ...>...</svg>",
+  "provider": "svg-paths",
+  "quality": "standard",
+  "credits": 1,
+  "generationId": "clx123abc",
+  "usage": {
+    "monthlyUsed": 3,
+    "monthlyLimit": 10,
+    "monthlyRemaining": 7,
+    "bonusCredits": 30,
+    "remaining": 37,
+    "limit": 10,
+    "resetsAt": "2026-07-01T00:00:00.000Z"
+  }
+}
+```
+
+</ResponseExample>
+
+## HTTP status codes
+
+Same as [Generate logo](/api-reference/describe-api/generate-logo#http-status-codes). Describe-only `project_limit_exceeded` does not apply to SVG paths.
+
+See [Errors](/api-reference/describe-api/errors) for `code` values and examples.

@@ -21,6 +21,10 @@
     {
       "source": "/api-reference/studio-logo-api/:slug*",
       "destination": "/api-reference/describe-api/:slug*"
+    },
+    {
+      "source": "/api-reference/describe-api/svg-paths",
+      "destination": "/api-reference/describe-api/generate-svg-paths"
     }
   ],
   "navigation": {
@@ -36,6 +40,7 @@
               "api-reference/describe-api/authentication",
               "api-reference/describe-api/quickstart",
               "api-reference/describe-api/generate-logo",
+              "api-reference/describe-api/generate-svg-paths",
               "api-reference/describe-api/get-usage",
               "api-reference/describe-api/errors",
               "api-reference/describe-api/quotas",

@@ -1,18 +1,26 @@
 ---
 title: Authentication
-description: Bearer API keys for Describe API requests
+description: Bearer API keys for Logo Lattice API requests
 icon: key
 ---
 
-All v1 logo endpoints require an API key in the `Authorization` header:
+Every `/api/v1/logos` endpoint requires a Studio API key in the `Authorization` header:
 
 ```http
-Authorization: Bearer <api_key>
+Authorization: Bearer ll_live_…
+Content-Type: application/json
 ```
+
+(Post routes only need `Content-Type`; `GET /usage` needs `Authorization` only.)
 
 ## Key format
 
-Keys use the prefix `ll_live_` followed by a secret. The full value is shown **once** when you create the key in Studio.
+| Item | Value |
+| ---- | ----- |
+| Header | `Authorization: Bearer ll_live_…` |
+| Key prefix | `ll_live_` (full secret shown **once** when created) |
+| Max active keys | **5** per account |
+| Subscription | **Studio** required |
 
 <Warning>
   Never commit API keys to source control. Store keys in environment variables or a secrets manager (for example `LOGO_LATTICE_API_KEY`).
@@ -35,15 +43,15 @@ Keys use the prefix `ll_live_` followed by a secret. The full value is shown **o
   </Step>
 </Steps>
 
-## Limits and behaviour
+## Auth failures
 
-| Rule | Detail |
-| --- | --- |
-| Active keys | Up to **5** per Studio account |
-| Revoked keys | Return **401** immediately |
-| Non-Studio accounts | Cannot create keys or call the API (**403**) |
+| HTTP | `code` | When |
+| ---- | ------ | ---- |
+| `401` | `invalid_key` | Missing or malformed Bearer header, wrong prefix, or unknown key |
+| `401` | `revoked` | Key was revoked |
+| `403` | `not_premium` | Account no longer has Studio |
 
-## Example header
+## Example
 
 ```bash
 export LOGO_LATTICE_API_KEY="ll_live_YOUR_SECRET_HERE"

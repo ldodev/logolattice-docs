@@ -1,18 +1,22 @@
 ---
 title: Changelog
-description: Describe API version history
+description: Logo Lattice API version history
 icon: clock-rotate-left
 ---
 
 ## Unreleased
 
-- Optional brand palette fields on `POST /api/v1/logos`: `brandName`, `brandColors`, `referenceColors` (same colour-direction behaviour as Describe in the editor; pass hex colours explicitly; no Studio brand lookup by ID)
+- **SVG paths** - `POST /api/v1/logos/svg-paths` and `"provider": "svg-paths"` on `POST /api/v1/logos` for editable path SVG without a cloud project
+- **`quality`** on SVG paths - `standard` (1 credit) or `enhanced` (2 credits)
+- **`provider`** on `POST /api/v1/logos` - `"openrouter"` (default) or `"svg-paths"`
+- Optional brand palette fields: `brandName`, `brandColors`, `referenceColors` (same colour-direction behaviour as Describe in the editor)
+- CORS on `/api/v1/:path*` for browser clients (Mintlify, `*.logolattice.com`, localhost)
 
 ## v1.0.0
 
-<Note>Initial public release of the Describe API under `/api/v1`.</Note>
+<Note>Initial public release under `/api/v1`.</Note>
 
-- `POST /api/v1/logos` - generate SVG and cloud project from a text prompt
+- `POST /api/v1/logos` - generate SVG and cloud project from a text prompt (Describe)
 - `GET /api/v1/logos/usage` - read AI credit balance without generating
 - Bearer authentication with `ll_live_` API keys
 - Optional reference images (PNG, JPEG, WebP; max 4 MB decoded)

@@ -1,71 +1,70 @@
 ---
 title: Errors
-description: HTTP status codes and error codes for the Describe API
+description: HTTP status codes and error codes for the Logo Lattice API
 icon: triangle-exclamation
 ---
 
-Failed requests return JSON with a human-readable message and a machine-readable `code`.
-
-## Error response shape
+Failed requests return JSON:
 
 ```json
 {
   "error": "Human-readable message",
   "code": "error_code",
-  "usage": { }
+  "usage": { },
+  "details": { }
 }
 ```
 
-The `usage` object is included when relevant (for example quota errors), using the same fields as a successful generation response.
+- `code` - machine-readable when present
+- `usage` - included when relevant (for example quota errors), same fields as a successful generation
+- `details` - Zod validation (for example `fieldErrors`)
 
 ## HTTP status codes
 
 | Status | When |
-| --- | --- |
+| ------ | ---- |
 | `200` | Success |
-| `400` | Invalid JSON, validation failed, parse error, empty model result, cloud project limit (rare for Studio), invalid hex in `brandColors`/`referenceColors`, or `brandName` over 64 characters |
-| `401` | Missing or invalid Bearer token, or revoked key |
-| `403` | Account is not Studio |
-| `429` | No AI credits remaining |
-| `502` | Upstream model failure |
-| `503` | AI not configured on server |
+| `400` | Invalid JSON; Zod validation (`details` with `fieldErrors`); `invalid_input`; `parse_error`; `project_limit_exceeded` (Describe only) |
+| `401` | `invalid_key` or `revoked` |
+| `403` | `not_premium` - not on Studio |
+| `429` | `limit_exceeded` - no credits left (`usage` included) |
+| `502` | `upstream` - provider failure |
+| `503` | `not_configured` - AI/SVG provider not configured on server |
 
 ## Error codes
 
 | Code | HTTP | Meaning |
-| --- | --- | --- |
+| ---- | ---- | ------- |
 | `invalid_key` | `401` | Bad or missing API key |
 | `revoked` | `401` | Key was revoked |
 | `not_premium` | `403` | Studio subscription required |
-| `invalid_input` | `400` | Prompt, reference image, or brand colour validation failed |
-| `parse_error` | `400` | Model returned unusable logo data |
-| `project_limit_exceeded` | `400` | Cannot create cloud project (free-tier project cap) |
+| `invalid_input` | `400` | Bad reference image, prompt rules, etc. |
+| `parse_error` | `400` | Model returned empty or unusable logo (Describe) |
+| `project_limit_exceeded` | `400` | Cloud project cap hit (Describe only) |
 | `limit_exceeded` | `429` | No AI generations left |
-| `upstream` | `502` | OpenAI or other upstream error |
-| `not_configured` | `503` | AI unavailable on server |
+| `upstream` | `502` | Provider failure |
+| `not_configured` | `503` | AI/SVG provider not configured |
 
-## Example: invalid request (validation)
-
-When request parsing fails (for example an invalid hex in `referenceColors`), the response may include Zod `details`:
+## Example: validation
 
 ```json
 {
   "error": "Invalid request.",
   "details": {
     "fieldErrors": {
-      "referenceColors": ["Invalid hex colour."]
+      "prompt": ["String must contain at least 10 character(s)"]
     }
   }
 }
 ```
 
-Other **400** cases include `brandName` longer than 64 characters after trim and invalid entries in `brandColors`.
+Other **400** cases include invalid hex in `brandColors`/`referenceColors` and `brandName` longer than 64 characters after trim.
 
 ## Example: quota exceeded
 
 ```json
 {
-  "error": "No AI generations remaining this month.",
+  "error": "You have no AI generations left. Top up for 30 more, or wait until your free quota resets.",
   "code": "limit_exceeded",
   "usage": {
     "monthlyUsed": 10,
@@ -74,7 +73,7 @@ Other **400** cases include `brandName` longer than 64 characters after trim and
     "bonusCredits": 0,
     "remaining": 0,
     "limit": 10,
-    "resetsAt": "2026-06-01T00:00:00.000Z"
+    "resetsAt": "2026-07-01T00:00:00.000Z"
   }
 }
 ```

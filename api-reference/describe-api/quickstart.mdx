@@ -19,7 +19,9 @@ Generate a logo in three steps: set your API key, call the API, and use the resp
 export LOGO_LATTICE_API_KEY="ll_live_YOUR_SECRET_HERE"
 ```
 
-## 2. Generate a logo
+## 2. Generate a logo (Describe)
+
+Default `POST /api/v1/logos` uses the same **Describe** flow as the editor (1 credit, cloud project + `editUrl`):
 
 ```bash
 curl -X POST "https://logolattice.com/api/v1/logos" \
@@ -29,11 +31,13 @@ curl -X POST "https://logolattice.com/api/v1/logos" \
   -o response.json
 ```
 
+For **SVG paths only** (no cloud project), add `"provider":"svg-paths"` or call `/api/v1/logos/svg-paths` - see [Generate SVG paths](/api-reference/describe-api/generate-svg-paths).
+
 ## 3. Use the response
 
 The JSON body includes:
 
-| Field       | Use                                                    |
+| Field       | Use (Describe)                                         |
 | ----------- | ------------------------------------------------------ |
 | `svg`       | Write to a `.svg` file or pass to your design pipeline |
 | `editUrl`   | Open in the browser while signed in to refine the mark |
@@ -64,6 +68,7 @@ curl "https://logolattice.com/api/v1/logos/usage" \
 ## Next steps
 
 - [Generate logo](/api-reference/describe-api/generate-logo) - full request and response reference
+- [Generate SVG paths](/api-reference/describe-api/generate-svg-paths) - path-only generation
 - [Best practices](/api-reference/describe-api/best-practices) - write effective prompts
 - [Reference images](/api-reference/describe-api/reference-images) - optional palette and composition hints
-- [Generate logo → Brand colours](/api-reference/describe-api/generate-logo#brand-colours-in-the-api) - pass `brandColors` and `referenceColors` for Describe-style palette control
+- [Generate logo → Brand colours](/api-reference/describe-api/generate-logo#brand-colours-in-the-api) - `brandColors` and `referenceColors`

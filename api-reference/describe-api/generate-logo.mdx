@@ -1,10 +1,15 @@
 ---
 title: Generate logo
-description: POST /api/v1/logos - create a vector logo from a text prompt
+description: POST /api/v1/logos - Describe (default) or SVG paths from a text prompt
 openapi: "POST /api/v1/logos"
 ---
 
-Generate a logo from a text brief. Returns SVG, a cloud `projectId`, and an `editUrl` to continue in the editor.
+Generate a logo from a text brief.
+
+- **Default** (`provider` omitted or `"openrouter"`): same **Describe** flow as the editor - SVG, cloud `projectId`, and `editUrl`. **1 credit** per success.
+- **`"provider": "svg-paths"`**: editable path SVG, no cloud project. Use `quality` for standard (**1** credit) or enhanced (**2** credits). Same response shape as [Generate SVG paths](/api-reference/describe-api/generate-svg-paths).
+
+For a dedicated SVG paths route (no `provider` field), use `POST /api/v1/logos/svg-paths`.
 
 ## Request
 
@@ -20,6 +25,14 @@ Generate a logo from a text brief. Returns SVG, a cloud `projectId`, and an `edi
 
 <ParamField body="prompt" type="string" required>
   Logo brief after trimming. **10–800 characters.** Describe style, subject, colours, and grid feel (for example isometric, minimal facets).
+</ParamField>
+
+<ParamField body="provider" type="string">
+  `"openrouter"` (default) or `"svg-paths"`. Only used on this endpoint; ignored on `/svg-paths`.
+</ParamField>
+
+<ParamField body="quality" type="string">
+  `"standard"` (default) or `"enhanced"`. **SVG paths only.** Enhanced costs **2** credits.
 </ParamField>
 
 <ParamField body="referenceImageBase64" type="string">
@@ -91,11 +104,18 @@ Palette context only (softer colour guidance, no `referenceColors`):
 
 <RequestExample dropdown>
 
-```bash Minimal · Bash
+```bash Describe · Bash
 curl -X POST "https://logolattice.com/api/v1/logos" \
   -H "Authorization: Bearer $LOGO_LATTICE_API_KEY" \
   -H "Content-Type: application/json" \
-  -d '{"prompt":"Isometric teal mountain mark, minimal facets"}'
+  -d '{"prompt":"Isometric amber fox head, 6-8 facets, warm palette, clean silhouette for app icon"}'
+```
+
+```bash SVG paths via provider · Bash
+curl -X POST "https://logolattice.com/api/v1/logos" \
+  -H "Authorization: Bearer $LOGO_LATTICE_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"prompt":"Geometric mountain mark, teal and white, minimal paths","provider":"svg-paths","quality":"enhanced"}'
 ```
 
 ```bash With brand palette · Bash
@@ -290,13 +310,16 @@ echo $data['editUrl'] . PHP_EOL;
 
 ## Response
 
+The response shape depends on `provider`.
+
+### Describe (`openrouter`, default)
+
 <ResponseField name="svg" type="string" required>
-  Full SVG document with clean paths. Transparent artboard; suitable for web, print, and design tools. Server-side export. Web fonts in text logos may differ slightly from the browser editor when
-  custom fonts were used.
+  Full SVG document (same idea as **Export → Download SVG**). Transparent artboard; suitable for web, print, and design tools.
 </ResponseField>
 
 <ResponseField name="editUrl" type="string" required>
-  URL to open the project in Logo Lattice. Requires the API key owner to be signed in. Not a public anonymous editor link.
+  URL to open the project in Logo Lattice while signed in. Not a public anonymous editor link.
 </ResponseField>
 
 <ResponseField name="projectId" type="string" required>
@@ -304,8 +327,12 @@ echo $data['editUrl'] . PHP_EOL;
 </ResponseField>
 
 <ResponseField name="usage" type="object" required>
-  Remaining AI credits after this generation. Monthly limit resets at the UTC month boundary (`resetsAt`).
+  Quota snapshot after this generation. Monthly pool resets at `resetsAt` (UTC month boundary).
 </ResponseField>
+
+### SVG paths (`provider: "svg-paths"`)
+
+Same fields as [Generate SVG paths](/api-reference/describe-api/generate-svg-paths#response): `svg`, `provider` (`"svg-paths"`), `quality`, optional `credits` and `generationId`, and `usage`. No `editUrl` or `projectId`.
 
 <ResponseField name="usage.monthlyUsed" type="integer">
   Credits used this calendar month (UTC).
@@ -337,9 +364,9 @@ echo $data['editUrl'] . PHP_EOL;
 
 <ResponseExample>
 
-```json Success
+```json Describe success
 {
-  "svg": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>...",
+  "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" ...>...</svg>",
   "editUrl": "https://logolattice.com/?project=clx123abc",
   "projectId": "clx123abc",
   "usage": {
@@ -349,14 +376,33 @@ echo $data['editUrl'] . PHP_EOL;
     "bonusCredits": 0,
     "remaining": 7,
     "limit": 10,
-    "resetsAt": "2026-06-01T00:00:00.000Z"
+    "resetsAt": "2026-07-01T00:00:00.000Z"
+  }
+}
+```
+
+```json SVG paths success
+{
+  "svg": "<svg ...>...</svg>",
+  "provider": "svg-paths",
+  "quality": "standard",
+  "credits": 1,
+  "generationId": "clx123abc",
+  "usage": {
+    "monthlyUsed": 3,
+    "monthlyLimit": 10,
+    "monthlyRemaining": 7,
+    "bonusCredits": 30,
+    "remaining": 37,
+    "limit": 10,
+    "resetsAt": "2026-07-01T00:00:00.000Z"
   }
 }
 ```
 
 ```json Error
 {
-  "error": "No AI generations remaining this month.",
+  "error": "You have no AI generations left. Top up for 30 more, or wait until your free quota resets.",
   "code": "limit_exceeded",
   "usage": {
     "monthlyUsed": 10,
@@ -377,7 +423,7 @@ echo $data['editUrl'] . PHP_EOL;
 | Status | When                                                                                     |
 | ------ | ---------------------------------------------------------------------------------------- |
 | `200`  | Success                                                                                  |
-| `400`  | Invalid JSON, validation failed (prompt, reference image, invalid hex in `brandColors`/`referenceColors`, `brandName` over 64 chars), parse error, empty model result, or cloud project limit |
+| `400`  | Invalid JSON, validation (`details.fieldErrors`), `invalid_input`, `parse_error`, or `project_limit_exceeded` (Describe only) |
 | `401`  | Missing, invalid, or revoked Bearer token                                                |
 | `403`  | Account is not Studio                                                                    |
 | `429`  | No AI credits remaining                                                                  |
