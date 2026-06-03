@@ -8,14 +8,17 @@ The **Logo Lattice API** (`/api/v1`) lets [Logo Lattice Studio](https://logolatt
 
 <Warning>This API is available only to **Logo Lattice Studio** subscribers. Free accounts cannot create API keys or call these endpoints.</Warning>
 
-## Base URLs
+## Base URL
 
 | Environment | Base URL |
 | ----------- | -------- |
 | Production | `https://logolattice.com` |
-| Local | `http://localhost:3000` |
 
 API prefix: `/api/v1`. Example: `https://logolattice.com/api/v1/logos`
+
+<Info>
+  For local Logo Lattice development, use `http://localhost:3000` as the base URL. The published docs and API playground use production only; run `npm run dev` to preview docs with a localhost server in **Try it**.
+</Info>
 
 The OpenAPI spec in this docs site powers Mintlify **API reference** and **Try it** for all logo routes.
 
