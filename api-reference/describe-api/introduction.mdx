@@ -10,40 +10,32 @@ The **Logo Lattice API** (`/api/v1`) lets [Logo Lattice Studio](https://logolatt
 
 ## Base URL
 
-| Environment | Base URL |
-| ----------- | -------- |
-| Production | `https://logolattice.com` |
+All API requests use `https://logolattice.com` with prefix `/api/v1`.
 
-API prefix: `/api/v1`. Example: `https://logolattice.com/api/v1/logos`
-
-<Info>
-  For local Logo Lattice development, use `http://localhost:3000` as the base URL. The published docs and API playground use production only; run `npm run dev` to preview docs with a localhost server in **Try it**.
-</Info>
-
-The OpenAPI spec in this docs site powers Mintlify **API reference** and **Try it** for all logo routes.
+Example: `https://logolattice.com/api/v1/logos`
 
 ## Endpoints
 
-| Method | Path | Purpose |
-| ------ | ---- | ------- |
-| `POST` | `/api/v1/logos` | Generate a logo (default Describe + cloud project; optional SVG paths via `provider`) |
-| `POST` | `/api/v1/logos/svg-paths` | Dedicated SVG paths generation (no cloud project) |
-| `GET` | `/api/v1/logos/usage` | Read AI quota without spending a credit |
+| Method | Path                      | Purpose                                                                               |
+| ------ | ------------------------- | ------------------------------------------------------------------------------------- |
+| `POST` | `/api/v1/logos`           | Generate a logo (default Describe + cloud project; optional SVG paths via `provider`) |
+| `POST` | `/api/v1/logos/svg-paths` | Dedicated SVG paths generation (no cloud project)                                     |
+| `GET`  | `/api/v1/logos/usage`     | Read AI quota without spending a credit                                               |
 
 ## Choosing an endpoint
 
-| Need | Endpoint |
-| ---- | -------- |
-| Cloud project + `editUrl` (same as in-editor **Describe**) | `POST /api/v1/logos` (default, or `"provider": "openrouter"`) |
-| Editable path SVG only, no cloud project | `POST /api/v1/logos/svg-paths` **or** `POST /api/v1/logos` with `"provider": "svg-paths"` |
-| Check quota before batch jobs | `GET /api/v1/logos/usage` |
+| Need                                                       | Endpoint                                                                                  |
+| ---------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| Cloud project + `editUrl` (same as in-editor **Describe**) | `POST /api/v1/logos` (default, or `"provider": "openrouter"`)                             |
+| Editable path SVG only, no cloud project                   | `POST /api/v1/logos/svg-paths` **or** `POST /api/v1/logos` with `"provider": "svg-paths"` |
+| Check quota before batch jobs                              | `GET /api/v1/logos/usage`                                                                 |
 
 ## Providers
 
-| Provider | Behaviour | Credits |
-| -------- | --------- | ------- |
-| `openrouter` (default) | Same **Describe** flow as the editor: SVG + cloud project + `editUrl` | **1** per success |
-| `svg-paths` | Editable path SVG via dedicated upstream; no cloud project | **1** (`standard`) or **2** (`enhanced`) |
+| Provider               | Behaviour                                                             | Credits                                  |
+| ---------------------- | --------------------------------------------------------------------- | ---------------------------------------- |
+| `openrouter` (default) | Same **Describe** flow as the editor: SVG + cloud project + `editUrl` | **1** per success                        |
+| `svg-paths`            | Editable path SVG via dedicated upstream; no cloud project            | **1** (`standard`) or **2** (`enhanced`) |
 
 Set `"provider": "svg-paths"` on the main route, or call [Generate SVG paths](/api-reference/describe-api/generate-svg-paths) directly.
 
@@ -55,28 +47,28 @@ Set `"provider": "svg-paths"` on the main route, or call [Generate SVG paths](/a
 
 Describe (default), SVG paths, in-app **Describe**, and **Export → AI stylise** all draw from the same credit pool. Studio includes **10** free generations per UTC calendar month; [top-ups](https://logolattice.com) add bonus credits that stack and do not expire.
 
-| Operation | Credits |
-| --------- | ------- |
-| `POST /api/v1/logos` (Describe / `openrouter`) | 1 |
-| `POST /api/v1/logos` or `/svg-paths` (`svg-paths`, `standard`) | 1 |
-| SVG paths `enhanced` | 2 |
-| `GET /api/v1/logos/usage` | 0 |
+| Operation                                                      | Credits |
+| -------------------------------------------------------------- | ------- |
+| `POST /api/v1/logos` (Describe / `openrouter`)                 | 1       |
+| `POST /api/v1/logos` or `/svg-paths` (`svg-paths`, `standard`) | 1       |
+| SVG paths `enhanced`                                           | 2       |
+| `GET /api/v1/logos/usage`                                      | 0       |
 
 Successful generations include an updated `usage` object. When out of credits, `POST` returns **429** with `code: "limit_exceeded"`. See [Quotas and billing](/api-reference/describe-api/quotas).
 
 ## What the API returns (and does not)
 
-| Returns | Does not return |
-| ------- | --------------- |
-| SVG string | PNG or other raster formats |
+| Returns                                   | Does not return                 |
+| ----------------------------------------- | ------------------------------- |
+| SVG string                                | PNG or other raster formats     |
 | `editUrl` and `projectId` (Describe only) | Raw `.logolattice` project JSON |
-| Quota snapshot after generation | Anonymous public editor links |
+| Quota snapshot after generation           | Anonymous public editor links   |
 
 ## CORS (browser clients)
 
 `OPTIONS` is supported on all logo routes. CORS middleware applies on `/api/v1/:path*`.
 
-Allowed origins include `*.logolattice.com`, Mintlify hosts, and `localhost`. Extra origins can be set with `LOGO_API_CORS_ORIGINS` (comma-separated).
+Allowed origins include `*.logolattice.com` and Mintlify hosts. Add more with `LOGO_API_CORS_ORIGINS` (comma-separated).
 
 Preflight allows `GET`, `POST`, and `OPTIONS` with headers `Authorization` and `Content-Type`.
 
